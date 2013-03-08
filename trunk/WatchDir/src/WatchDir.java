@@ -129,12 +129,36 @@ public class WatchDir {
 
             for (WatchEvent<?> event: key.pollEvents()) {
                 WatchEvent.Kind kind = event.kind();
-
+                
                 // TBD - provide example of how OVERFLOW event is handled
                 if (kind == OVERFLOW) {
                     continue;
                 }
-
+                
+                /* Test to see if you can read a file before it is changed.
+                 * You can not :(
+                
+                if (kind == ENTRY_MODIFY) {
+                											//can we read the file before it is changed?
+                	File test = new File("C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/Workspace/Test.txt");
+                	
+                	try {
+						FileReader read = new FileReader(test);
+						BufferedReader bReader = new BufferedReader(read);
+						
+						String in;
+						while ((in = bReader.readLine()) != null) {
+							System.out.println(in);
+						}
+						
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+                }
+                //*/
+                
                 // Context for directory entry event is the file name of entry
                 WatchEvent<Path> ev = cast(event);
                 Path name = ev.context();
