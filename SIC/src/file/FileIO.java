@@ -1,6 +1,12 @@
 package file;
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * FileIO class contains the methods to read and write data
@@ -11,8 +17,6 @@ import java.io.FileNotFoundException;
  * 		writeFile
  * 		deleteFile
  * 
- * TODO: determine data type to read/write data from/to
- * 		currently type Object
  */
 
 
@@ -20,20 +24,33 @@ public class FileIO {
 
 	/**
 	 * readFile reads a file at the specified path and returns 
-	 * the contents in ###<DATA TYPE TO BE SPECIFIED LATER>### form.
+	 * the contents in byte array form.
 	 * 
 	 * @param file is the file to be read
 	 * 
 	 * @throws FileNotFoundException if the file does not exist
 	 */
-	public Object readFile(File file) throws FileNotFoundException {
+	public byte[] readFile(File file) throws FileNotFoundException {
 		
 		if (!file.exists()) {
 			throw new FileNotFoundException("File at "+file.getAbsolutePath()+" was not found");
 		}
 		
+		byte[] data = null;
 		
-		return null;
+		DataInputStream in;
+		try {
+			in = new DataInputStream(new BufferedInputStream(new FileInputStream(file.getAbsolutePath())));
+			
+			data = new byte[in.available()];
+			in.readFully(data);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		
+		return data;
 		
 	}
 	
@@ -43,8 +60,25 @@ public class FileIO {
 	 * 
 	 * @param file is the file to be read
 	 * @param data is the data to write to the file
+	 * @throws IOException 
 	 */
-	public void writeFile(File file, Object data) {
+	public void writeFile(File file, byte[] data) throws IOException {
+		
+
+		if (!file.exists()) {
+			file.createNewFile();
+		}
+		
+		DataOutputStream out = null;
+		try {
+			out = new DataOutputStream(new FileOutputStream(file));
+
+			for (byte i : data) {
+				out.writeByte(i);
+			}
+		} catch (IOException e) {
+			
+		}
 		
 		
 		
@@ -64,8 +98,8 @@ public class FileIO {
 		}
 		
 		
+		file.delete();
 		
 	}
-	
-	
+
 }
