@@ -13,6 +13,8 @@ package network;
 
 public final class SicNetworkProtocol {
 
+	public static final int port = 7532;
+	
 	public static final String _RevisionRequest = "Yo Dawg, what revision are we at?";
 	public static final String _RevisionRequestResponce = "Ya dawg, we are at revision ";
 	
