@@ -1,6 +1,6 @@
 package gui;
 /**
- * Gui stuff. icky.
+ * Gui stuff. yuck.
  *
  */
 
