@@ -24,4 +24,26 @@ public class Friend implements Serializable {
 	
 	private ArrayList<Directory> _sharedDirs;
 	
+	public Friend(String name, InetAddress ip){
+		_name = name;
+		_ip = ip;
+	}
+	
+	public void set_name(String new_name){
+		_name = new_name;
+	}
+	
+	public String get_name(){
+		return _name;
+	}
+	
+	public void set_ip(InetAddress new_ip){
+		_ip = new_ip;
+	}
+	
+	public InetAddress get_ip(){
+		return _ip;
+	}
+	
+	
 }
