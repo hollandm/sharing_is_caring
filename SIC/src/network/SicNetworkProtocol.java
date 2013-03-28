@@ -15,27 +15,32 @@ public final class SicNetworkProtocol {
 
 	public static final int port = 7532;
 	
-	public static final String _RevisionRequest = "Yo Dawg, what revision are we at?";
-	public static final String _RevisionRequestResponce = "Ya dawg, we are at revision ";
+	public static final int cmdPacketSize = 10;		//size of command size 
+	public static final int dataPacketSize = 100;	//maximum size of a data packet
+	
+	
+	/**
+	 * first bit in data represents weather or not the packet is a command or a piece of data
+	 * if 0 then packet is a cmd, otherwiser it is data
+	 */
+	public static final int cmdMarker = 0;
+	public static final int dataMarker = 1;
+	
+	public static final int pushRevision = 1;
+	public static final int requestRevision = 2;
+	
 	
 	
 	/**
 	 * parseRevisionResponce takes data and returns an integer representing the revision
 	 * 
-	 * @param responce the string received over the network
+	 * @param responce the data received over the network
 	 * @return
 	 */
-	public static int parseRevisionResponce(String responce) {
-		String[] revision = responce.split(_RevisionRequestResponce);
-		
-		return Integer.parseInt(revision[1]);
+	public static int parseRevisionResponce(byte[] responce) {
+		return 0;
 		
 	}
 
-	public static void main(String[] args) {
-		
-		int rev = parseRevisionResponce("Ya dawg, we are at revision 21");
-		System.out.println(rev);
-	}
 	
 }
