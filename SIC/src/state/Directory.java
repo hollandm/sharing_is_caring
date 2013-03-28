@@ -44,9 +44,4 @@ public class Directory implements Serializable{
 		this._friends = _friends;
 	}
 	
-	
-	public void testSVN(){
-		
-	}
-	
 }
