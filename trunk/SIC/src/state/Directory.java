@@ -45,4 +45,8 @@ public class Directory implements Serializable{
 	}
 	
 	
+	public void testSVN(){
+		
+	}
+	
 }
