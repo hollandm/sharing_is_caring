@@ -20,24 +20,32 @@ public final class SicNetworkProtocol {
 	
 	
 	/**
-	 * first bit in data represents weather or not the packet is a command or a piece of data
-	 * if 0 then packet is a cmd, otherwiser it is data
+	 * first byte in data represents whether or not the packet is a command or a piece of data
+	 * if 0 then packet is a cmd, otherwise it is data
 	 */
-	public static final int cmdMarker = 0;
-	public static final int dataMarker = 1;
+	public static final byte cmdMarker = 0;
+	// if packet is commandpacket, second byte is actual command
+	public static final byte dataMarker = 1;
 	
-	public static final int pushRevision = 1;
-	public static final int requestRevision = 2;
+	/*
+	 * commands
+	 * pushRevision:	sender is indicating that receiver should be prepared
+	 * 					to receive an update
+	 * requestRevision:	sender is indicating that receiver should send out
+	 * 					an update
+	 */
+	public static final byte pushRevision = 1;
+	public static final byte requestRevision = 2;
 	
 	
 	
 	/**
-	 * parseRevisionResponce takes data and returns an integer representing the revision
+	 * parseRevisionResponse takes data and returns an integer representing the revision
 	 * 
-	 * @param responce the data received over the network
+	 * @param response the data received over the network
 	 * @return
 	 */
-	public static int parseRevisionResponce(byte[] responce) {
+	public static int parseRevisionResponse(byte[] response) {
 		return 0;
 		
 	}
