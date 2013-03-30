@@ -33,10 +33,10 @@ public class NetworkComms implements Runnable {
 	public static void main(String args[]) throws IOException, InterruptedException {
 		
 		
-		/*
+		
 		byte[] dataIN = new byte[7];
 		
-		MulticastSocket in = new MulticastSocket(6000);
+		MulticastSocket in = new MulticastSocket(9001);
 		DatagramPacket recv = new DatagramPacket(dataIN, 7);
 //		SocketAddress addr = SocketAddress;
 		InetAddress add = InetAddress.getByName("224.0.0.1");
@@ -57,8 +57,8 @@ public class NetworkComms implements Runnable {
 			
 			
 		}
-		*/
 		
+		/*
 		//client
 		byte[] data = new byte[7];
 		data[0]=0;
@@ -71,12 +71,12 @@ public class NetworkComms implements Runnable {
 		
 		
 //		DatagramSocket DGSocket = new DatagramSocket(6000);
-		MulticastSocket out = new MulticastSocket(6000);
+		MulticastSocket out = new MulticastSocket(9001);
 		InetAddress dest = InetAddress.getByName("224.0.0.1");
 //		InetAddress dest = InetAddress.getByName("255.255.255.255");
 //		InetAddress dest = InetAddress.getByName("192.168.0.119");
 		
-		DatagramPacket send = new DatagramPacket(data, 7, dest, 6000);
+		DatagramPacket send = new DatagramPacket(data, 7, dest, 9001);
 		
 		while (true) {
 //			DGSocket.send(send);
@@ -84,7 +84,7 @@ public class NetworkComms implements Runnable {
 			Thread.sleep(10);
 		}
 		
-		
+		*/
 		
 	}
 

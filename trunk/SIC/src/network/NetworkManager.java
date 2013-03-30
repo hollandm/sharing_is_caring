@@ -8,6 +8,8 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.Socket;
+import java.net.SocketException;
+import java.nio.ByteBuffer;
 import java.util.Vector;
 
 /**
@@ -22,86 +24,73 @@ import java.util.Vector;
  *
  */
 
-public class NetworkManager implements Runnable{
+public class NetworkManager {
 
-	@Override
-	public void run() {
-		
-		Vector<byte[]> bigBuffer = new Vector<byte[]>();
-		
+	private MulticastSocket listener;
+	private InetAddress group;
+	
+	public SicUploader uploader;
+	
+	
+
+	
+	
+	public void listen() {
 		try {
-			MulticastSocket listener = new MulticastSocket (9001);
-			
-			byte[] cmdIN = new byte[SicNetworkProtocol.cmdPacketSize]; //10
-			byte[] dataIN = new byte[SicNetworkProtocol.dataPacketSize]; //100
-			
+
+			byte[] cmdIN = new byte[SicNetworkProtocol.cmdPacketSize];
+
 			DatagramPacket recvCmd = new DatagramPacket(cmdIN, SicNetworkProtocol.cmdPacketSize); //DatagramPacket for receiving packets of length 10
-			DatagramPacket recvData = new DatagramPacket(dataIN, SicNetworkProtocol.dataPacketSize);
-			
-			InetAddress add = InetAddress.getByName("224.0.0.1");
-			listener.joinGroup(add); //join the multicast group
-			
-			listener.setReceiveBufferSize(SicNetworkProtocol.cmdPacketSize); //sets buffer size to 100
-			
+
 			System.out.println("Listening to traffic");
-			
+
 			while (true) {
-				
+
 				listener.receive(recvCmd); //fills command buffer with data received
 				if(receiveCommand(recvCmd)) {
-					listener.setReceiveBufferSize(SicNetworkProtocol.dataPacketSize);
-					try {
-						while(true) {
-							listener.receive(recvData);
-							bigBuffer.add(recvData.getData());
-							
-						}
-					}
-					catch(EOFException e) {
-						bigBuffer.add(recvData.getData());
-					}
-					File file = new File("Desktop\testFile.txt");
-					FileIO fio = new FileIO();
-					for(int i = 0; i < bigBuffer.size(); i++) {
-						fio.writeFile(file, bigBuffer.elementAt(i));
-					}
+					System.out.println("File Transfer Initiated");
+//					this.initiateFileDownload();
+
 				}
-				listener.setReceiveBufferSize(SicNetworkProtocol.cmdPacketSize);
-				bigBuffer.clear();
-				
-				
+
+
 			}
-			
-//			listener.close();
-			
+
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
 	}
-	
-	/**
-	 * This method is called when a file transfer has been initiated.
-	 * It will process file fragments and then save them to the reassembled file to the disk
-	 * If a packet is lost it will send a NACK notifying the sender that it was not received.
-	 * 
-	 * 
-	 */
-	public void parseData(byte[] cmd) {
-		
-		
-		
+
+	public void initalizeConnection() throws IOException {
+		listener = new MulticastSocket (SicNetworkProtocol.port);
+//		group = InetAddress.getByName("224.0.0.1");
+		group = InetAddress.getByName("230.0.0.10");
+		listener.joinGroup(group); //join the multicast group
+
+		listener.setReceiveBufferSize(SicNetworkProtocol.cmdPacketSize); //sets buffer size to 100
+
 	}
 	
+	public void terminateConnection() throws IOException {
+		listener.leaveGroup(group);
+		listener.close();
+	}
+
+	
+
 	public boolean receiveCommand(DatagramPacket packet) {
 		byte[] data = packet.getData();
 		if(data[1] == SicNetworkProtocol.pushRevision) {
 			return true;
 		}
 		return false;
-		
+
 	}
+
 
 	
 	
+
 }
