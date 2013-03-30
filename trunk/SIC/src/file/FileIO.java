@@ -12,11 +12,6 @@ import java.io.IOException;
  * FileIO class contains the methods to read and write data
  * to the syced directory(s).
  * 
- * TODO: Implement methods
- * 		readFile
- * 		writeFile
- * 		deleteFile
- * 
  */
 
 

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 /**
  * Settings contains the data needed for the program to run
  * 
- *
  */
 
 

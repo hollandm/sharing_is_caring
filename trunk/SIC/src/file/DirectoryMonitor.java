@@ -4,6 +4,7 @@ package file;
  * The DirectoryMonitor scans a directory and reports
  * whenever a file within the directory has been modified
  * 
+ * TODO: make this tie into the rest of the program
  * 
  */
 
