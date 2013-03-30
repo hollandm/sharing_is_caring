@@ -112,14 +112,16 @@ public class SicUploader {
 		
 		//if it is the last fragment to be sent then handle it specially
 		if (fragID+1 == fragmentsNeeded) {
-			//TODO: handle last fragment being smaller than all the others
-			//PS: what i have right now does't work
 			System.out.println("last fragment = " + fragmentsNeeded);
-			fragment = new byte[fileData.length - fragID * SicNetworkProtocol.dataPacketDataCapacity];
-			sendData.setData(fragment);
 			
-			for (int i = 0; i < fragment.length; ++i) {
-				fragment[i] = fileData[fragID * SicNetworkProtocol.dataPacketDataCapacity + i];
+			int remainingData = fileData.length - fragID * SicNetworkProtocol.dataPacketDataCapacity;
+			for (int i = SicNetworkProtocol.dataPacketHeaderSize + remainingData; i < fragment.length; ++i) {
+				fragment[i] = 0;
+			}
+			
+			for (int i = 0; i < remainingData; ++i) {
+				fragment[SicNetworkProtocol.dataPacketHeaderSize + i] 
+						= fileData[fragID * SicNetworkProtocol.dataPacketDataCapacity + i];
 			}
 			
 			listener.send(sendData);
@@ -130,16 +132,16 @@ public class SicUploader {
 		for (int dataPtr = 0; dataPtr < SicNetworkProtocol.dataPacketDataCapacity; ++dataPtr) {
 			int readByte =   fragID * SicNetworkProtocol.dataPacketDataCapacity + dataPtr;
 			
-			fragment[SicNetworkProtocol.dataPacketHeaderSize+dataPtr] = fileData[readByte];
+			fragment[dataPtr] = fileData[readByte];
 			
 		}
 		
 		//send the fragment
 		listener.send(sendData);
+		//TODO: Calibrate wait time
 		try {
 			Thread.sleep(5);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -152,7 +154,7 @@ public class SicUploader {
 		
 		Vector<File> filesChanged = new Vector<File>();
 //		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/test.exe"));
-		filesChanged.add(new File("C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/test.exe"));
+		filesChanged.add(new File("C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/test.txt"));
 		
 		MulticastSocket listener = new MulticastSocket (SicNetworkProtocol.port);
 //		group = InetAddress.getByName("224.0.0.1");

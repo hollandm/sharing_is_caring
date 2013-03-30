@@ -49,7 +49,10 @@ public class SicDownloader {
 		
 		//Receive info packet
 		listener.receive(recvData);
-		int fragments = 490;
+//		int fragments = 490;
+		int fragments = 1;
+		//TODO: set fileData buffer size based off size sent in info packet to fix bug
+		//currently any remaining space in the data buffer will be added onto the sent files :(
 		fileData = new byte[(fragments)*SicNetworkProtocol.dataPacketDataCapacity];
 		
 		//download all fragments
@@ -60,7 +63,7 @@ public class SicDownloader {
 		//TODO: request any missed or damaged packets
 		
 		//write data to disk
-		File file = new File("C:/Users/Matthew.Matt-Desktop/Desktop/testFile.exe");
+		File file = new File("C:/Users/Matthew.Matt-Desktop/Desktop/testFile.txt");
 		if (!file.exists()) file.createNewFile();
 		fio.writeFile(file, fileData);
 	}
