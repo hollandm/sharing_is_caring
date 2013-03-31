@@ -28,6 +28,9 @@ public class SicUploader {
 	
 	private DatagramPacket sendData;
 	
+	
+	
+	
 	public SicUploader(MulticastSocket listener, InetAddress group) {
 		this.listener = listener;
 		this.group = group;
@@ -43,11 +46,15 @@ public class SicUploader {
 		sendData = new DatagramPacket(fragment, fragment.length, group, SicNetworkProtocol.port);
 	}
 	
+	
+	
+	
 	public void initateUpload(Vector<File> filesChanged) throws IOException {
 
 		//send cmdBuffer packet notifying of revision update
 		for (int i = 0; i < SicNetworkProtocol.cmdPacketSize; ++i) cmdBuffer[i] = 0;
 		cmdBuffer[1] = 1;
+		SicNetworkProtocol.setNumFiles(cmdBuffer, filesChanged.size());
 		listener.send(cmdPacket);
 
 		
@@ -70,6 +77,9 @@ public class SicUploader {
 
 	}
 	
+	
+	
+	
 	public void sendFile(File file, int fileCounter) throws IOException {
 		
 		//read file to buffer
@@ -81,12 +91,9 @@ public class SicUploader {
 		
 		//send startFile packet
 		cmdBuffer[1] = 50;
-		byte[] byteCount = ByteBuffer.allocate(4).putInt(fragmentsNeeded).array();
-		for (int i = 0; i < 4; ++i) {
-			cmdBuffer[i+2] = byteCount[i];
-		}
+		SicNetworkProtocol.setFileSize(cmdBuffer, fileData.length);
 		//TODO: set file path
-		
+		listener.send(cmdPacket);
 		
 		//set file id number
 		byte[]  fileNum = ByteBuffer.allocate(4).putInt(fileCounter).array();
@@ -160,6 +167,12 @@ public class SicUploader {
 //		group = InetAddress.getByName("224.0.0.1");
 		InetAddress group = InetAddress.getByName("230.0.0.10");
 		listener.joinGroup(group); //join the multicast group
+		
+		try {
+			Thread.sleep(10);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		
 		SicUploader uploader = new SicUploader(listener, group);
 		uploader.initateUpload(filesChanged);
