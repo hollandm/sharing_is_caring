@@ -41,8 +41,10 @@ public class SicDownloader {
 	
 	public void initiateFileDownload(byte[] initiationPacket) throws IOException {
 		
+		System.out.println("File Transfer Initiated");
+		
 		//get number of files to download
-		int numFiles = SicNetworkProtocol.getFileSize(initiationPacket);
+		int numFiles = SicNetworkProtocol.getNumFiles(initiationPacket);
 		
 		//download every file
 		for (int curFile = 0; numFiles > curFile; ++curFile) {
@@ -73,8 +75,11 @@ public class SicDownloader {
 		
 		//TODO: request any missed or damaged packets
 		
+		System.out.print("File Recieved!");
+		
 		//write data to disk
-		File file = new File("C:/Users/Matthew.Matt-Desktop/Desktop/testFile.txt");
+//		File file = new File("C:/Users/Matthew.Matt-Desktop/Desktop/testFile.txt");
+		File file = new File("C:/Users/Matt/Desktop/testFile.txt");
 		if (!file.exists()) file.createNewFile();
 		fio.writeFile(file, fileData);
 	}
@@ -111,6 +116,7 @@ public class SicDownloader {
 		byte[] cmdIN = new byte[SicNetworkProtocol.cmdPacketSize];
 		DatagramPacket recvCmd = new DatagramPacket(cmdIN, SicNetworkProtocol.cmdPacketSize); //DatagramPacket for receiving packets of length 10
 		listener.receive(recvCmd); //fills command buffer with data receive
+		
 		
 		SicDownloader downloader = new SicDownloader(listener);
 		downloader.initiateFileDownload(cmdIN);
