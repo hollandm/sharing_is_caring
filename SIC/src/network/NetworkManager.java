@@ -30,9 +30,11 @@ public class NetworkManager {
 	private InetAddress group;
 	
 	public SicUploader uploader;
+	SicDownloader downloader;
 	
-	
-
+	public NetworkManager() {
+		downloader = new SicDownloader(listener);
+	}
 	
 	
 	public void listen() {
@@ -49,8 +51,7 @@ public class NetworkManager {
 				listener.receive(recvCmd); //fills command buffer with data received
 				if(receiveCommand(recvCmd)) {
 					System.out.println("File Transfer Initiated");
-//					this.initiateFileDownload();
-
+					downloader.initiateFileDownload(cmdIN);
 				}
 
 
