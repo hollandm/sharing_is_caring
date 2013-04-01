@@ -1,6 +1,7 @@
 package state;
 
 import java.io.Serializable;
+import java.net.InetAddress;
 import java.util.ArrayList;
 
 /**
@@ -20,13 +21,13 @@ public class Directory implements Serializable{
 	private static final long serialVersionUID = 312784493590177413L;
 
 	private String _id;
+	
+
+	private String _netName;
 	private String _path;
-	private int _revision;
 	
 	private Log _log;
 	
-	private ArrayList<Friend> _friends;
-
 	
 	public String get_id() {
 		return _id;
@@ -48,12 +49,12 @@ public class Directory implements Serializable{
 		return _log;
 	}
 
-	public ArrayList<Friend> get_friends() {
-		return _friends;
+	public String get_netName() {
+		return _netName;
 	}
 
-	public void set_friends(ArrayList<Friend> _friends) {
-		this._friends = _friends;
+	public void set_netName(String _netName) {
+		this._netName = _netName;
 	}
-	
+
 }

@@ -1,15 +1,11 @@
 package network;
 
-import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.SocketException;
-import java.nio.ByteBuffer;
-import java.util.Vector;
-
 import file.FileIO;
 
 public class SicDownloader {
@@ -52,6 +48,7 @@ public class SicDownloader {
 		}
 		
 		
+		
 	}
 
 	
@@ -82,6 +79,8 @@ public class SicDownloader {
 		File file = new File("C:/Users/Matt/Desktop/testFile.txt");
 		if (!file.exists()) file.createNewFile();
 		fio.writeFile(file, fileData);
+		
+		fileData = null;
 	}
 	
 	public void downloadFragment(int fragID) throws IOException {

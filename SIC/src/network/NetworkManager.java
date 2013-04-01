@@ -1,6 +1,8 @@
 package network;
 
 import file.FileIO;
+import gui.Gui;
+
 import java.io.IOException;
 import java.io.EOFException;
 import java.io.File;
@@ -10,7 +12,13 @@ import java.net.MulticastSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Vector;
+
+import Main.SicComponents;
+
+import state.Directory;
+import state.Settings;
 
 /**
  * Scans inbound network traffic for SIC data
@@ -26,14 +34,21 @@ import java.util.Vector;
 
 public class NetworkManager {
 
+//	private SICComponents components;
+	
 	private MulticastSocket listener;
 	private InetAddress group;
 	
 	public SicUploader uploader;
-	SicDownloader downloader;
+	public SicDownloader downloader;
+
+	public SicComponents components;
 	
-	public NetworkManager() {
-		downloader = new SicDownloader(listener);
+	public NetworkManager(SicComponents components) {
+		this.components = components;
+		
+//		uploader = new SicUploader(listener, group);
+//		downloader = new SicDownloader(listener);
 	}
 	
 	

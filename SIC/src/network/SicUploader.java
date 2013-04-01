@@ -1,13 +1,10 @@
 package network;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.util.Vector;
 
 import file.FileIO;
@@ -20,11 +17,11 @@ public class SicUploader {
 	
 	private int fragmentsNeeded;			//number of fragments needed for a fike
 	
-	private byte[] fragment;		//fragment about to be sent
-	private byte[] fileData;		//data read from file
+	private byte[] fragment;				//fragment about to be sent
+	private byte[] fileData;				//data read from file
 	
 	private DatagramPacket cmdPacket;		//multicast packet containing a command
-	private byte[] cmdBuffer;		//command packet buffer
+	private byte[] cmdBuffer;				//command packet buffer
 	
 	private DatagramPacket sendData;
 	
@@ -59,10 +56,10 @@ public class SicUploader {
 
 		
 		//update fragment header with current revision number
-		byte[] revisionNum = ByteBuffer.allocate(4).putInt(0).array();
-		for (int i = 0; i < 4; ++i) {
-			fragment[i+1] = revisionNum[i];
-		}
+//		byte[] revisionNum = ByteBuffer.allocate(4).putInt(0).array();
+//		for (int i = 0; i < 4; ++i) {
+//			fragment[i+1] = revisionNum[i];
+//		}
 		//TODO: implement revison numbers, currently always recvision 0
 		
 		//loop through files
@@ -96,10 +93,10 @@ public class SicUploader {
 		listener.send(cmdPacket);
 		
 		//set file id number
-		byte[]  fileNum = ByteBuffer.allocate(4).putInt(fileCounter).array();
-		for (int i = 0; i < 4; ++i) {
-			fragment[i+5] = fileNum[i];
-		}
+//		byte[]  fileNum = ByteBuffer.allocate(4).putInt(fileCounter).array();
+//		for (int i = 0; i < 4; ++i) {
+//			fragment[i+5] = fileNum[i];
+//		}
 		
 		//send file in fragments
 		for (int fragID = 0; fragmentsNeeded > fragID; ++fragID) {
@@ -112,10 +109,10 @@ public class SicUploader {
 	public void sendFragment(int fragID) throws IOException {
 		
 		//set fragment id number
-		byte[]  fragmentNum = ByteBuffer.allocate(4).putInt(fragID).array();
-		for (int i = 0; i < 4; ++i) {
-			fragment[i+9] = fragmentNum[i];
-		}
+//		byte[]  fragmentNum = ByteBuffer.allocate(4).putInt(fragID).array();
+//		for (int i = 0; i < 4; ++i) {
+//			fragment[i+9] = fragmentNum[i];
+//		}
 		
 		//if it is the last fragment to be sent then handle it specially
 		if (fragID+1 == fragmentsNeeded) {
