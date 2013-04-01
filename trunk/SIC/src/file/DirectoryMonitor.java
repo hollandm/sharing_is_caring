@@ -24,16 +24,27 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import Main.SicComponents;
+
+import state.Directory;
+import state.Settings;
 
 public class DirectoryMonitor implements Runnable{
 
 	private final WatchService watcher;
 	private final Map<WatchKey,Path> keys;
 	
-
-	public void registerDir(Path dir) throws IOException {
+	private SicComponents components;
+	
+	public void addDirectory(Directory dir) {
+		//TODO: add a directory to the file monitor
+	}
+	
+	private void registerDir(Path dir) throws IOException {
 		SimpleFileVisitor<Path> dirScanner = new SimpleFileVisitor<Path>() {
 			@Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
@@ -46,14 +57,16 @@ public class DirectoryMonitor implements Runnable{
 		Files.walkFileTree(dir, dirScanner);
 	}
 
-	public void registerFile(Path file) throws IOException {
+	private void registerFile(Path file) throws IOException {
 		WatchKey key = file.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
 
 		keys.put(key, file);
 	}
 
 
-	public DirectoryMonitor() throws IOException {
+	public DirectoryMonitor(SicComponents compoenents) throws IOException {
+		this.components = compoenents;
+		
 		this.watcher = FileSystems.getDefault().newWatchService();
 		this.keys = new HashMap<WatchKey,Path>();
 	}
@@ -68,6 +81,15 @@ public class DirectoryMonitor implements Runnable{
 		WatchKey key = null;
 		
 		while (true) {
+			
+			//TODO: somebody who knows more about threads should optimize this
+			if (!components.settings.is_auto_updates_enabled()) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 			
             try {
                 key = watcher.take();

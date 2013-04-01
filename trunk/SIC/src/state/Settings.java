@@ -1,6 +1,7 @@
 package state;
 
 import java.io.Serializable;
+import java.net.InetAddress;
 import java.util.ArrayList;
 
 /**
@@ -15,16 +16,15 @@ public class Settings implements Serializable {
 	
 	
 	private boolean _auto_updates_enabled;
-	
-	private ArrayList<Friend> _freinds;
-	private ArrayList<Directory> _directories;
-	
-	
+
+	InetAddress _multicastGroup;
+	private ArrayList<String> _directoriePaths;
+
+	private int _revision;
 	
 	public Settings() {
-		
-		_freinds = new ArrayList<Friend>();
-		_directories = new ArrayList<Directory>();
+		_auto_updates_enabled = false;
+		_directoriePaths = new ArrayList<String>();
 	}
 	
 	public boolean is_auto_updates_enabled() {
@@ -35,19 +35,17 @@ public class Settings implements Serializable {
 		this._auto_updates_enabled = _auto_updates_enabled;
 	}
 
-	public ArrayList<Friend> get_freinds() {
-		return _freinds;
+	public ArrayList<String> getDirectoryList() {
+		return _directoriePaths;
 	}
 
-	public ArrayList<Directory> get_directories() {
-		return _directories;
+	
+	public InetAddress get_multicastGroup() {
+		return _multicastGroup;
 	}
-
-	public static void main(String[] args) {
-		
-		Settings test = new Settings();
-		
+	
+	public void set_multicastGroup(InetAddress _multicastGroup) {
+		this._multicastGroup = _multicastGroup;
 	}
-
 	
 }
