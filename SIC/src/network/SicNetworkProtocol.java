@@ -1,6 +1,7 @@
 package network;
 
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
 
 /**
  * SicNetworkProtocol is a simple class to store
@@ -87,24 +88,29 @@ public final class SicNetworkProtocol {
 		return getIntFromByteArray(dataPacket, 9);
 	}
 	
+	
+	
+	
 	private static int getIntFromByteArray(byte[] array, int location) {
-		//TODO: optimize this with a shift instead of multiplication
-		return 	  array[location  ]*256*256*256 
-				+ array[location+1]*256*256 
-				+ array[location+2]*256
-				+ array[location+3];
 		
+		return array[location] << 24 | (array[location+1] & 0xFF) << 16 | (array[location+2] & 0xFF) << 8 | (array[location+3] & 0xFF);
 	}
 	
 	private static void placeIntInByteArray(byte[] array, int location, int placeMe) {
-		//TODO: optimize this
-		array[location+3] = (byte)(placeMe % 256);
-		placeMe /= 256;
-		array[location+2] = (byte)(placeMe % 256);
-		placeMe /= 256;
-		array[location+1] = (byte)(placeMe % 256);
-		placeMe /= 256;
-		array[location]   = (byte)(placeMe);
+		        array[location] = (byte) (placeMe >> 24);
+		        array[location+1] = (byte) (placeMe >> 16);
+		     	array[location+2] = (byte) (placeMe >> 8);
+		        array[location+3] = (byte) placeMe;
+	}
+	
+	public static void main(String[] args) {
+		
+		byte[] test = new byte[100];
+		
+		placeIntInByteArray(test, 10, 200);
+		
+		System.out.println(getIntFromByteArray(test, 10));
+		
 	}
 	
 }

@@ -58,7 +58,6 @@ public class SicDownloader {
 		listener.receive(recvData);
 		int fileSize = SicNetworkProtocol.getFileSize(dataIN);
 		System.out.println("File Size: "+fileSize);
-		//TODO: I think fileSize may be one byte larger than it needs to be, investigate this
 		
 		int fragments = fileSize / SicNetworkProtocol.dataPacketDataCapacity + 1;
 		fileData = new byte[fileSize];
@@ -75,8 +74,8 @@ public class SicDownloader {
 		System.out.print("File Recieved!");
 		
 		//write data to disk
-//		File file = new File("C:/Users/Matthew.Matt-Desktop/Desktop/testFile.txt");
-		File file = new File("C:/Users/Matt/Desktop/testFile.txt");
+		File file = new File("C:/Users/Matthew.Matt-Desktop/Desktop/test/testFile.exe");
+//		File file = new File("C:/Users/Matt/Desktop/testFile.txt");
 		if (!file.exists()) file.createNewFile();
 		fio.writeFile(file, fileData);
 		
@@ -85,17 +84,19 @@ public class SicDownloader {
 	
 	public void downloadFragment(int fragID) throws IOException {
 		
-		//Receive file
+		//Receive fragment
 		listener.receive(recvData);
-		
+		System.out.println(fragID);
 		//copy data after header to fileData buffer
 		for (int i = 0; i < SicNetworkProtocol.dataPacketDataCapacity; ++i) {
 			
-			if (i < fileData.length) {
+			int writeLoc = fragID*(SicNetworkProtocol.dataPacketDataCapacity) + i;
+			
+			if (writeLoc < fileData.length) {
 				//TODO: check header for segment # and place accordingly instead of just placing them in order received.
 				
 				byte bleh = dataIN[SicNetworkProtocol.dataPacketHeaderSize + i];
-				fileData[fragID*(SicNetworkProtocol.dataPacketDataCapacity) + i] = bleh;
+				fileData[writeLoc] = bleh;
 			}
 			
 		}
