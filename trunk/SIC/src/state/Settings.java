@@ -18,13 +18,13 @@ public class Settings implements Serializable {
 	private boolean _auto_updates_enabled;
 
 	InetAddress _multicastGroup;
-	private ArrayList<String> _directoriePaths;
+	private ArrayList<Directory> _directories;
 
 	private int _revision;
 	
 	public Settings() {
 		_auto_updates_enabled = false;
-		_directoriePaths = new ArrayList<String>();
+		_directories = new ArrayList<Directory>();
 	}
 	
 	public boolean is_auto_updates_enabled() {
@@ -35,8 +35,8 @@ public class Settings implements Serializable {
 		this._auto_updates_enabled = _auto_updates_enabled;
 	}
 
-	public ArrayList<String> getDirectoryList() {
-		return _directoriePaths;
+	public ArrayList<Directory> getDirectoryList() {
+		return _directories;
 	}
 
 	

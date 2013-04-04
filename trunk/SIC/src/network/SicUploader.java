@@ -86,6 +86,8 @@ public class SicUploader {
 		//calculate number of fragments required for file
 		fragmentsNeeded = (int) Math.ceil((double)(fileData.length)/((double)SicNetworkProtocol.dataPacketDataCapacity));
 		
+		System.out.println("Sedning " + fileData.length + " Bytes via " + fragmentsNeeded +"");
+		
 		//send startFile packet
 		cmdBuffer[1] = 50;
 		SicNetworkProtocol.setFileSize(cmdBuffer, fileData.length);
@@ -136,7 +138,7 @@ public class SicUploader {
 		for (int dataPtr = 0; dataPtr < SicNetworkProtocol.dataPacketDataCapacity; ++dataPtr) {
 			int readByte =   fragID * SicNetworkProtocol.dataPacketDataCapacity + dataPtr;
 			
-			fragment[dataPtr] = fileData[readByte];
+			fragment[SicNetworkProtocol.dataPacketHeaderSize + dataPtr] = fileData[readByte];
 			
 		}
 		
@@ -157,8 +159,8 @@ public class SicUploader {
 	public static void main(String[] args) throws IOException {
 		
 		Vector<File> filesChanged = new Vector<File>();
-//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/test.exe"));
-		filesChanged.add(new File("C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/test.txt"));
+		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/test.exe"));
+//		filesChanged.add(new File("C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/test.exe"));
 		
 		MulticastSocket listener = new MulticastSocket (SicNetworkProtocol.port);
 //		group = InetAddress.getByName("224.0.0.1");
