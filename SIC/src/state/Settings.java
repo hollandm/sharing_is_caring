@@ -42,6 +42,7 @@ public class Settings implements Serializable {
 
 	public void updateDirectory(String directory)
 	{
+		System.err.println("UPdated path");
 		_directoriePaths.add(0, directory);
 	}
 	
@@ -50,6 +51,7 @@ public class Settings implements Serializable {
 	}
 	
 	public void set_multicastGroup(InetAddress _multicastGroup) {
+		System.err.println("UPdated address");
 		this._multicastGroup = _multicastGroup;
 	}
 	
