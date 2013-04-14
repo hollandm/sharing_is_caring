@@ -10,6 +10,7 @@ import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.InetAddress;
+import java.net.InetAddress;
 
 import javax.swing.*;
 
@@ -123,7 +124,7 @@ public class Gui implements ActionListener{
 	class FriendGui implements ActionListener{
 
 		protected JButton setMulticastAddressButton = new JButton("Update Multicast Address");
-		protected JFrame myFrame = new JFrame();
+		protected Frame myFrame = new Frame();
 		protected JButton homeButton = new JButton("Home");
 		protected String addressString = "255.255.255.110";
 		protected JFormattedTextField address = new JFormattedTextField();
@@ -188,7 +189,7 @@ public class Gui implements ActionListener{
 			/**<-------------Add everything to top frame-------------------> */
 
 			myFrame.add(mainBox);
-			myFrame.setVisible(true);
+			myFrame.setVisible(false);
 
 		}
 
@@ -202,10 +203,16 @@ public class Gui implements ActionListener{
 
 	}
 
+	class Frame extends JFrame{
+		Frame(){
+			setVisible(false);
+		}
+	}
+	
 	class FolderGui implements ActionListener{
 
 		protected JButton setFolderAddressButton = new JButton("Update Folder Directory");
-		protected JFrame myFrame = new JFrame();
+		protected Frame myFrame = new Frame();
 		protected ButtonGroup updateToggle = new ButtonGroup();
 		protected JButton homeButton = new JButton("Home");
 		protected String addressString = "P:\\Folder";
@@ -271,7 +278,7 @@ public class Gui implements ActionListener{
 			/**<-------------Add everything to top frame-------------------> */
 
 			myFrame.add(mainBox);
-			myFrame.setVisible(true);
+			myFrame.setVisible(false);
 
 		}
 
@@ -283,7 +290,7 @@ public class Gui implements ActionListener{
 			}			
 		}
 	}
-
+	
 	/** create and startup a SwingDemo */
 	public static void main(String[] args)
 	{
