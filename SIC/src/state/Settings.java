@@ -42,8 +42,13 @@ public class Settings implements Serializable {
 
 	public void updateDirectory(String directory)
 	{
+		if(_directoriePaths.isEmpty()) {
+			_directoriePaths.add(directory);
+		}
+		else {
+			_directoriePaths.set(0, directory);
+		}
 		System.err.println("UPdated path");
-		_directoriePaths.add(0, directory);
 	}
 	
 	public InetAddress get_multicastGroup() {
@@ -54,5 +59,10 @@ public class Settings implements Serializable {
 		System.err.println("UPdated address");
 		this._multicastGroup = _multicastGroup;
 	}
-	
+	public String toString() {
+		return "auto updates: "+_auto_updates_enabled
+				+", multicast group: "+_multicastGroup
+				+", directories: "+_directoriePaths
+				+", revision: "+_revision;
+	}
 }
