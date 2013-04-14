@@ -3,6 +3,7 @@ package state;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Vector;
 
 /**
  * Settings contains the data needed for the program to run
@@ -41,7 +42,7 @@ public class Settings implements Serializable {
 
 	public void updateDirectory(String directory)
 	{
-		_directoriePaths.set(0, directory);
+		_directoriePaths.add(0, directory);
 	}
 	
 	public InetAddress get_multicastGroup() {
