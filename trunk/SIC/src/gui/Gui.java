@@ -3,14 +3,17 @@ package gui;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-//import java.awt.event.KeyEvent;
-//import java.awt.event.MouseEvent;
-//import java.awt.event.MouseListener;
-//import java.awt.event.MouseMotionListener;
-//import java.beans.PropertyChangeEvent;
-//import java.beans.PropertyChangeListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.net.InetAddress;
 
 import javax.swing.*;
+
+import state.Settings;
 
 public class Gui implements ActionListener{
 
@@ -29,6 +32,8 @@ public class Gui implements ActionListener{
 	protected FolderGui folder = new FolderGui();
 	protected JLabel multicastAddress = new JLabel("Multicast Address: ");
 	protected JLabel directoryAddress = new JLabel("Directory Address: ");
+	protected Settings setting;
+
 
 	public Gui(){
 		Dimension frameSize = new Dimension(600, 400);
@@ -285,7 +290,11 @@ public class Gui implements ActionListener{
 		Gui NiceGui = new Gui();
 	}//main
 
-
+	public void setSettings(Settings newSetting)
+	{
+		setting = newSetting;
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		if(arg0.getSource() == menuItemFriends){
@@ -301,23 +310,26 @@ public class Gui implements ActionListener{
 			myFrame.setVisible(true);
 			friend.myFrame.setVisible(false);
 			multicastAddress.setText(friend.addressString);
+			try{
+				setting.set_multicastGroup(InetAddress.getByName(multicastAddress.getText().trim()));
+			}
+			catch (Exception e){
+				//NOTHING!
+			}
 		}
 		else if (arg0.getSource() == autoUpdate){
 			updateButton.setEnabled(false);
+			setting.set_auto_updates_enabled(true);
 		}
 		else if (arg0.getSource() == manualUpdate){
 			updateButton.setEnabled(true);
-		}
-		else if(arg0.getSource() == menuFolder){
-			myFrame.setVisible(false);
-			folder.myFrame.setVisible(true);
-			folder.address.setValue(folder.addressString);
+			setting.set_auto_updates_enabled(false);
 		}
 		else if(arg0.getSource() == folder.homeButton){
 			myFrame.setVisible(true);
 			folder.myFrame.setVisible(false);
 			directoryAddress.setText(folder.addressString);
-
+			setting.updateDirectory(directoryAddress.getText().trim());
 		}
 		else if(arg0.getSource() == menuFolder){
 			myFrame.setVisible(false);
@@ -325,9 +337,4 @@ public class Gui implements ActionListener{
 		}
 
 	}
-
-
-
-
-
 }
