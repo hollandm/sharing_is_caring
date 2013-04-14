@@ -6,6 +6,8 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.SocketException;
+import java.net.UnknownHostException;
+
 import file.FileIO;
 
 public class SicDownloader {
@@ -27,6 +29,14 @@ public class SicDownloader {
 		ackArray[0] = 0;
 		
 		for (int i = 1; i < SicNetworkProtocol.cmdPacketSize; ++i) ackArray[i] = 1;
+		ack = new DatagramPacket(ackArray, SicNetworkProtocol.cmdPacketSize);
+		try {
+			ack.setAddress(InetAddress.getByName("230.0.0.10"));
+		} catch (UnknownHostException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		//TODO use ip from settings
 		
 		try {
 			listener.setReceiveBufferSize(SicNetworkProtocol.dataPacketSize);
@@ -37,7 +47,6 @@ public class SicDownloader {
 
 		dataIN = new byte[SicNetworkProtocol.dataPacketSize]; 
 		recvData = new DatagramPacket(dataIN, SicNetworkProtocol.dataPacketSize);
-		ack = new DatagramPacket(ackArray, SicNetworkProtocol.dataPacketSize);
 		
 		fio = new FileIO();
 		
@@ -50,7 +59,7 @@ public class SicDownloader {
 		
 		System.out.println("File Transfer Initiated");
 		
-		//Sends and acknowledgement after receiving the initial request.
+		//Sends and acknowledgment after receiving the initial request.
 		listener.send(ack);
 		
 		//get number of files to download
