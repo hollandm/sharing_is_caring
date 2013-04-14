@@ -195,9 +195,17 @@ public class Gui implements ActionListener{
 
 
 		@Override
+		// if set is pressed, update addressString
+		// set in settings
 		public void actionPerformed(ActionEvent arg0) {
 			if(arg0.getSource() == setMulticastAddressButton){
 				addressString = address.getText();
+				try{
+					setting.set_multicastGroup(InetAddress.getByName(addressString.trim()));
+				}
+				catch (Exception e){
+					//NOTHING!
+				}
 			}			
 		}
 
@@ -284,9 +292,11 @@ public class Gui implements ActionListener{
 
 
 		@Override
+		// set directory address
 		public void actionPerformed(ActionEvent arg0) {
 			if(arg0.getSource() == setFolderAddressButton){
 				addressString = address.getText();
+				setting.updateDirectory(addressString);
 			}			
 		}
 	}
@@ -304,26 +314,27 @@ public class Gui implements ActionListener{
 	
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
+		// if multicast menu item is selected, open up new window
 		if(arg0.getSource() == menuItemFriends){
 			friend.address.setValue(friend.addressString);
 			friend.myFrame.setVisible(true);
 			myFrame.setVisible(false);
 		}
+		
+		// update button updates version number
 		else if (arg0.getSource() == updateButton){
 			versionID++;
 			updateVersion.setText("Update Version: " + versionID);
 		}
+		
+		// in multicast gui, if pressed home, go back to main menu
 		else if (arg0.getSource() == friend.homeButton){
 			myFrame.setVisible(true);
 			friend.myFrame.setVisible(false);
 			multicastAddress.setText(friend.addressString);
-			try{
-				setting.set_multicastGroup(InetAddress.getByName(multicastAddress.getText().trim()));
-			}
-			catch (Exception e){
-				//NOTHING!
-			}
 		}
+		
+		// set toggle for auto update and manual update
 		else if (arg0.getSource() == autoUpdate){
 			updateButton.setEnabled(false);
 			setting.set_auto_updates_enabled(true);
@@ -332,12 +343,16 @@ public class Gui implements ActionListener{
 			updateButton.setEnabled(true);
 			setting.set_auto_updates_enabled(false);
 		}
+		
+		// if in directory management, and pressed home, go to home gui
+		// also set text in home gui to reflect any changes
 		else if(arg0.getSource() == folder.homeButton){
 			myFrame.setVisible(true);
 			folder.myFrame.setVisible(false);
 			directoryAddress.setText(folder.addressString);
-			setting.updateDirectory(directoryAddress.getText().trim());
 		}
+		
+		// if clicked on directory management in menu, open new gui
 		else if(arg0.getSource() == menuFolder){
 			myFrame.setVisible(false);
 			folder.myFrame.setVisible(true);
