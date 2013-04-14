@@ -12,6 +12,7 @@ import java.beans.PropertyChangeListener;
 import java.net.InetAddress;
 import java.net.InetAddress;
 
+
 import javax.swing.*;
 
 import state.Settings;
@@ -190,6 +191,7 @@ public class Gui implements ActionListener{
 
 			myFrame.add(mainBox);
 			myFrame.setVisible(false);
+			myFrame.setVisible(false);
 
 		}
 
@@ -199,12 +201,16 @@ public class Gui implements ActionListener{
 		// set in settings
 		public void actionPerformed(ActionEvent arg0) {
 			if(arg0.getSource() == setMulticastAddressButton){
-				addressString = address.getText();
+				String temp = addressString;// = address.getText();
 				try{
+					addressString = address.getText();
 					setting.set_multicastGroup(InetAddress.getByName(addressString.trim()));
 				}
 				catch (Exception e){
-					//NOTHING!
+					JOptionPane jop = new JOptionPane();
+					jop.showMessageDialog(myFrame,"Invalid IP address: "+addressString,"AAAAAAAAAAAAAAAAAAAAAAAH!",0);
+					addressString = temp;
+					address.setText(addressString);
 				}
 			}			
 		}
@@ -287,6 +293,7 @@ public class Gui implements ActionListener{
 
 			myFrame.add(mainBox);
 			myFrame.setVisible(false);
+			myFrame.setVisible(false);
 
 		}
 
@@ -318,6 +325,7 @@ public class Gui implements ActionListener{
 		if(arg0.getSource() == menuItemFriends){
 			friend.address.setValue(friend.addressString);
 			friend.myFrame.setVisible(true);
+			folder.myFrame.setVisible(false);
 			myFrame.setVisible(false);
 		}
 		
@@ -355,8 +363,8 @@ public class Gui implements ActionListener{
 		// if clicked on directory management in menu, open new gui
 		else if(arg0.getSource() == menuFolder){
 			myFrame.setVisible(false);
+			friend.myFrame.setVisible(false);
 			folder.myFrame.setVisible(true);
 		}
-
 	}
 }

@@ -44,7 +44,7 @@ public class SicMain {
 		
 		//if first run then preform first time setup
 		if (!(new File(settingsPath).exists())) {
-			System.out.println("Settings file not detected, preforming first time setup");
+			System.out.println("Settings file not detected, performing first time setup");
 			firstTimeStartup = true;
 			firstTimeSetup(settingsPath);
 		} else {
