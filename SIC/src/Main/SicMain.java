@@ -73,22 +73,20 @@ public class SicMain {
 		
 		//load directories stored in settings file
 		//ensure integrity
-		ArrayList<Directory> dirList = settings.getDirectoryList();
+		ArrayList<String> dirList = settings.getDirectoryList();
 		for (int i = 0; i < dirList.size(); ++i) {
-			Directory dir  = dirList.get(i);
-//			try {
-				if (!dir.get_path().equals("")) {
-					File dirFile = new File(dir.get_path());
-				}
-//				ObjectInputStream dirReader = new ObjectInputStream(new FileInputStream(dirFile));
-				
+			String dirStr = dirList.get(i);
+			try {
+				File dirFile = new File(dirStr);
+				ObjectInputStream dirReader = new ObjectInputStream(new FileInputStream(dirFile));
+				Directory dir = (Directory) dirReader.readObject();
 				directoryList.add(dir);
-//			} catch (FileNotFoundException | ClassNotFoundException e) {
-//				System.err.println("Directory file missing or corrupt");
-//				//TODO: notify user and prompt them to fix it
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
+			} catch (FileNotFoundException | ClassNotFoundException e) {
+				System.err.println("Directory file missing or corrupt");
+				//TODO: notify user and prompt them to fix it
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		//start the network manager
@@ -103,6 +101,7 @@ public class SicMain {
 		
 		//display the gui
 		ui = new Gui();
+		ui.setSettings(settings);
 		
 	}
 	
@@ -132,6 +131,7 @@ public class SicMain {
 
 	public static void main(String[] args) {
 		SicMain MatthewIsAwesome = new SicMain();
+		
 	}
 
 }
