@@ -16,6 +16,8 @@ public class SicDownloader {
 	byte[] dataIN;
 	DatagramPacket recvData;
 	
+	String rootPath;
+	
 	private byte[] fileData;
 	
 	public SicDownloader(MulticastSocket listener) {
@@ -36,6 +38,9 @@ public class SicDownloader {
 	}
 	
 	public void initiateFileDownload(byte[] initiationPacket) throws IOException {
+		
+		//TODO: initiate rootPath better
+		rootPath = "C:/Users/Matt/Desktop/testFiles";
 		
 		System.out.println("File Transfer Initiated");
 		
@@ -59,6 +64,14 @@ public class SicDownloader {
 		int fileSize = SicNetworkProtocol.getFileSize(dataIN);
 		System.out.println("File Size: "+fileSize);
 		
+		char[] rPath = new char[95];
+		for (int i = 0; i < 95; ++i) {
+//			System.out.print((char)dataIN[7+i]);
+			rPath[i] = (char) dataIN[7+i];
+		}
+		String relativePath = String.valueOf(rPath);
+		System.out.println("Relative Path: "+relativePath);
+		
 		int fragments = fileSize / SicNetworkProtocol.dataPacketDataCapacity + 1;
 		fileData = new byte[fileSize];
 		
@@ -74,8 +87,7 @@ public class SicDownloader {
 		System.out.print("File Recieved!");
 		
 		//write data to disk
-		File file = new File("C:/Users/Matthew.Matt-Desktop/Desktop/test/testFile.exe");
-//		File file = new File("C:/Users/Matt/Desktop/testFile.txt");
+		File file = new File(rootPath+"/"+relativePath);
 		if (!file.exists()) file.createNewFile();
 		fio.writeFile(file, fileData);
 		
@@ -86,7 +98,7 @@ public class SicDownloader {
 		
 		//Receive fragment
 		listener.receive(recvData);
-		System.out.println(fragID);
+//		System.out.println(fragID);
 		//copy data after header to fileData buffer
 		for (int i = 0; i < SicNetworkProtocol.dataPacketDataCapacity; ++i) {
 			

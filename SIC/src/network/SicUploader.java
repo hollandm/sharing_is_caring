@@ -46,11 +46,11 @@ public class SicUploader {
 	
 	
 	
-	public void initateUpload(Vector<File> filesChanged) throws IOException {
+	public void initateUpload(Vector<File> filesChanged, String directoryPath, int revision) throws IOException {
 
 		//send cmdBuffer packet notifying of revision update
 		for (int i = 0; i < SicNetworkProtocol.cmdPacketSize; ++i) cmdBuffer[i] = 0;
-		cmdBuffer[1] = 1;
+		cmdBuffer[1] = SicNetworkProtocol.pushRevision;
 		SicNetworkProtocol.setNumFiles(cmdBuffer, filesChanged.size());
 		listener.send(cmdPacket);
 
@@ -66,7 +66,7 @@ public class SicUploader {
 		int fileCounter = 0;
 		for (File file : filesChanged) {
 			
-			sendFile(file, fileCounter);
+			sendFile(file, fileCounter, directoryPath);
 			fileCounter++;
 			
 		}
@@ -77,7 +77,7 @@ public class SicUploader {
 	
 	
 	
-	public void sendFile(File file, int fileCounter) throws IOException {
+	public void sendFile(File file, int fileCounter, String rootPath) throws IOException {
 		
 		//read file to buffer
 		fileData = fio.readFile(file);
@@ -89,9 +89,24 @@ public class SicUploader {
 		System.out.println("Sedning " + fileData.length + " Bytes via " + fragmentsNeeded +"");
 		
 		//send startFile packet
-		cmdBuffer[1] = 50;
+		cmdBuffer[1] = SicNetworkProtocol.startFile;
 		SicNetworkProtocol.setFileSize(cmdBuffer, fileData.length);
-		//TODO: set file path
+		
+		
+		//Setting the relative path to the file from root directory. Placing that path in cmd Packet
+		String relativePath = file.getAbsolutePath().substring(rootPath.length());
+		System.out.println("Relative path sent: "+relativePath);
+		char[] rPath = relativePath.toCharArray();
+		
+		
+		if (rPath.length > 95) {	//TODO: use constant value here
+			System.err.println("path to long");
+			System.exit(-1);
+		}
+		
+		for (int i = 0; i < rPath.length; i++) {
+			cmdBuffer[7+i] = (byte) rPath[i];
+		}
 		listener.send(cmdPacket);
 		
 		//set file id number
@@ -104,7 +119,6 @@ public class SicUploader {
 		for (int fragID = 0; fragmentsNeeded > fragID; ++fragID) {
 			
 			sendFragment(fragID);
-			
 		}
 	}
 	
@@ -146,7 +160,7 @@ public class SicUploader {
 		listener.send(sendData);
 		//TODO: Calibrate wait time
 		try {
-			Thread.sleep(5);
+			Thread.sleep(15);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -158,8 +172,12 @@ public class SicUploader {
 	 */
 	public static void main(String[] args) throws IOException {
 		
+
+		
+		String root = "E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/";
+		
 		Vector<File> filesChanged = new Vector<File>();
-		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/test.exe"));
+		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.exe"));
 //		filesChanged.add(new File("C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/test.exe"));
 		
 		MulticastSocket listener = new MulticastSocket (SicNetworkProtocol.port);
@@ -174,7 +192,7 @@ public class SicUploader {
 		}
 		
 		SicUploader uploader = new SicUploader(listener, group);
-		uploader.initateUpload(filesChanged);
+		uploader.initateUpload(filesChanged,root,1);
 
 		
 		

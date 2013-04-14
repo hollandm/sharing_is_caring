@@ -74,8 +74,7 @@ public final class SicNetworkProtocol {
 	 * @return
 	 */
 	public static int parseRevisionResponse(byte[] response) {
-		return 0;
-		
+		return 0;	
 	}
 
 	
