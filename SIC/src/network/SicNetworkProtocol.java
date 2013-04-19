@@ -37,12 +37,14 @@ public final class SicNetworkProtocol {
 	// if packet is a command packet, second byte is actual command
 	public static final byte dataMarker = 1;
 	
-	/*
+	/**
 	 * commands
 	 * pushRevision:	sender is indicating that receiver should be prepared
 	 * 					to receive an update
 	 * requestRevision:	sender is indicating that receiver should send out
 	 * 					an update
+	 * startFile: 		sender is indicating that a file is about to be sent
+	 * 
 	 */
 	public static final byte pushRevision = 1;		//[4 bytes: revision #][4 bytes: # of files]
 		public static int getNumFiles(byte[] cmdPacket) {
@@ -62,9 +64,15 @@ public final class SicNetworkProtocol {
 			placeIntInByteArray(cmdPacket, 2, size);
 		}
 	
+
+
+	public static final byte ackTransfer  = 60;
+		
+	public static final byte ackFileStart    = 70;	//[4 bytes: file #]
+	public static final byte ackFileRecieve  = 75;	//[4 bytes: file #]
 	
-	public static final byte requestFragment = 70;	//[4 bytes: file #][4 bytes: fragment #]
-	
+	public static final byte nackFragment = 80;	//[4 bytes: file #][4 bytes: fragment #]
+		
 	
 	
 	/**
@@ -88,7 +96,9 @@ public final class SicNetworkProtocol {
 	}
 	
 	
-	
+	public static boolean isDataPacket(byte[] packet) {
+		return (packet[0] == 1);
+	}
 	
 	private static int getIntFromByteArray(byte[] array, int location) {
 		
