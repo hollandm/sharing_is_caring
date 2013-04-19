@@ -24,10 +24,11 @@ public class SicUploader {
 	
 	private DatagramPacket cmdPacket;		//multicast packet containing a command
 	private byte[] cmdBuffer;				//command packet buffer
-	private Vector<InetAddress> acksReceived;
 	private DatagramPacket sendData;
 	
-	
+	private Vector<InetAddress> acksExpected;
+	private DatagramPacket ackPacket;
+	private byte[] ackBuffer;
 	
 	
 	public SicUploader(MulticastSocket listener, InetAddress group) throws SocketException {
@@ -35,6 +36,10 @@ public class SicUploader {
 		this.listener.setSoTimeout(50);
 		this.group = group;
 		fio = new FileIO();
+		
+		ackBuffer = new byte[SicNetworkProtocol.cmdPacketSize];
+		ackPacket = new DatagramPacket(ackBuffer, SicNetworkProtocol.cmdPacketSize);
+		
 		
 		//Initialize cmd components
 		cmdBuffer = new byte[SicNetworkProtocol.cmdPacketSize];
@@ -50,7 +55,9 @@ public class SicUploader {
 	
 	
 	public void initateUpload(Vector<File> filesChanged, String directoryPath, int revision) throws IOException {
-		acksReceived = new Vector<InetAddress>();
+		System.out.println("Uploading " + filesChanged.size() + " files to peers");
+		
+		acksExpected = new Vector<InetAddress>();
 		
 		//send cmdBuffer packet notifying of revision update
 		for (int i = 0; i < SicNetworkProtocol.cmdPacketSize; ++i) cmdBuffer[i] = 0;
@@ -62,21 +69,14 @@ public class SicUploader {
 		//TODO: create acknowledged packet type and assign number to it
 		while(waitTime > System.currentTimeMillis()){
 			try{
-				listener.receive(cmdPacket);
-				System.out.println("Hi Viet, I'm waiting for wait time to be less than current time");
+				listener.receive(ackPacket);
 			} catch(SocketTimeoutException ste){
 				continue;
 			}
-			System.out.println("Packet has been received");
-			acksReceived.add(cmdPacket.getAddress());
+			acksExpected.add(ackPacket.getAddress());
 		}
-		System.out.println("I'm done waiting");
 		
 		//update fragment header with current revision number
-//		byte[] revisionNum = ByteBuffer.allocate(4).putInt(0).array();
-//		for (int i = 0; i < 4; ++i) {
-//			fragment[i+1] = revisionNum[i];
-//		}
 		//TODO: implement revison numbers, currently always recvision 0
 		
 		//loop through files
@@ -92,8 +92,6 @@ public class SicUploader {
 	}
 	
 	
-	
-	
 	public void sendFile(File file, int fileCounter, String rootPath) throws IOException {
 		
 		//read file to buffer
@@ -103,16 +101,40 @@ public class SicUploader {
 		//calculate number of fragments required for file
 		fragmentsNeeded = (int) Math.ceil((double)(fileData.length)/((double)SicNetworkProtocol.dataPacketDataCapacity));
 		
-		System.out.println("Sedning " + fileData.length + " Bytes via " + fragmentsNeeded +"");
 		
 		//send startFile packet
 		cmdBuffer[1] = SicNetworkProtocol.startFile;
 		SicNetworkProtocol.setFileSize(cmdBuffer, fileData.length);
 		
+//
+//		int recivedAcks = 0;
+//		Vector<InetAddress> acks = new Vector<InetAddress>();
+//		System.out.println(acksExpected.size());
+//		while (recivedAcks < acksExpected.size()) {
+//			try {
+//				listener.receive(ackPacket);
+//				if (acks.contains(ackPacket.getAddress())) {
+//					//dack so we can ignore it
+//				} else if (acksExpected.contains(ackPacket.getAddress())){
+//					//else if it is being sent from an expected host process it
+//					acks.add(ackPacket.getAddress());
+//					recivedAcks++;
+//				}
+//				System.out.println("Got one");
+//			} catch (IOException e) {
+//				continue;
+//			}
+//		}
+		
+		/** TODO
+		 * Here we should be getting an ack from each client
+		 * resend ctrPacket if we don't get a responce
+		 * time out after a few failures, remove client from acksRecieved List
+		 */
 		
 		//Setting the relative path to the file from root directory. Placing that path in cmd Packet
 		String relativePath = file.getAbsolutePath().substring(rootPath.length());
-		System.out.println("Relative path sent: "+relativePath);
+		System.out.println("File sent: "+relativePath+ ", " +fileData.length + " Bytes via " + fragmentsNeeded + " fragments." );
 		char[] rPath = relativePath.toCharArray();
 		
 		
@@ -121,35 +143,38 @@ public class SicUploader {
 			System.exit(-1);
 		}
 		
+
+
 		for (int i = 0; i < rPath.length; i++) {
 			cmdBuffer[7+i] = (byte) rPath[i];
 		}
+		for (int i = rPath.length+7; i < cmdBuffer.length;++i) {
+			cmdBuffer[i] = 0;
+		}	
 		listener.send(cmdPacket);
-		
-		//set file id number
-//		byte[]  fileNum = ByteBuffer.allocate(4).putInt(fileCounter).array();
-//		for (int i = 0; i < 4; ++i) {
-//			fragment[i+5] = fileNum[i];
-//		}
 		
 		//send file in fragments
 		for (int fragID = 0; fragmentsNeeded > fragID; ++fragID) {
 			
 			sendFragment(fragID);
 		}
+		System.out.println("\tFinished sending "+relativePath);
+		
+		//TODO: waiting for reliability acks/nacks should remove the need for this delay
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void sendFragment(int fragID) throws IOException {
 		
 		//set fragment id number
-//		byte[]  fragmentNum = ByteBuffer.allocate(4).putInt(fragID).array();
-//		for (int i = 0; i < 4; ++i) {
-//			fragment[i+9] = fragmentNum[i];
-//		}
+		SicNetworkProtocol.setDataFragmentId(fragment, fragID);
 		
 		//if it is the last fragment to be sent then handle it specially
 		if (fragID+1 == fragmentsNeeded) {
-			System.out.println("last fragment = " + fragmentsNeeded);
 			
 			int remainingData = fileData.length - fragID * SicNetworkProtocol.dataPacketDataCapacity;
 			for (int i = SicNetworkProtocol.dataPacketHeaderSize + remainingData; i < fragment.length; ++i) {
@@ -191,17 +216,20 @@ public class SicUploader {
 		
 
 		
-//		String root = "E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/";
-		String root = "/Users/VietPhan/Desktop/tests";
+		String root = "E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/";
 		
 		Vector<File> filesChanged = new Vector<File>();
-//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.exe"));
-//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.txt"));
-//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image.jpeg"));
+		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.exe"));
+//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test1.exe"));
+//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test2.exe"));
+		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.txt"));
+		
+		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image.jpeg"));
+//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/0.txt"));
 //		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image(1).jpeg"));
 //		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image(2).jpeg"));
 //		filesChanged.add(new File("C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/test.exe"));
-		filesChanged.add(new File("/Users/VietPhan/Desktop/test"));
+		
 		
 		MulticastSocket listener = new MulticastSocket (SicNetworkProtocol.port);
 //		group = InetAddress.getByName("224.0.0.1");

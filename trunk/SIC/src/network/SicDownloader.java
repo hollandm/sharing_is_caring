@@ -28,12 +28,12 @@ public class SicDownloader {
 		ackArray = new byte[SicNetworkProtocol.cmdPacketSize];
 		ackArray[0] = 0;
 		
+		
 		for (int i = 1; i < SicNetworkProtocol.cmdPacketSize; ++i) ackArray[i] = 1;
 		ack = new DatagramPacket(ackArray, SicNetworkProtocol.cmdPacketSize);
 		try {
 			ack.setAddress(InetAddress.getByName("230.0.0.10"));
 		} catch (UnknownHostException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		//TODO use ip from settings
@@ -57,13 +57,16 @@ public class SicDownloader {
 		//TODO: initiate rootPath better
 		rootPath = "C:/Users/Matt/Desktop/testFiles";
 		
-		System.out.println("File Transfer Initiated");
 		
-		//Sends and acknowledgment after receiving the initial request.
+		//Sends and acknowledgment after receiving the initial request
+		ackArray[1] = SicNetworkProtocol.ackTransfer;
 		listener.send(ack);
 		
 		//get number of files to download
 		int numFiles = SicNetworkProtocol.getNumFiles(initiationPacket);
+		
+
+		System.out.println("File Transfer Initiated, reciving "+numFiles+" files");
 		
 		//download every file
 		for (int curFile = 0; numFiles > curFile; ++curFile) {
@@ -78,31 +81,61 @@ public class SicDownloader {
 	public void downloadFile() throws IOException {
 		
 		//Receive info packet
-		listener.receive(recvData);
-		int fileSize = SicNetworkProtocol.getFileSize(dataIN);
-		System.out.println("File Size: "+fileSize);
+		do {
+			listener.receive(recvData);
+			if (dataIN[1] != SicNetworkProtocol.startFile) {
+				System.err.println("Did not recieve file start packet");
+			}
+		} while (dataIN[1] != SicNetworkProtocol.startFile);
+			
+//		if (dataIN[1] != SicNetworkProtocol.startFile) {
+//			System.err.println("Did not recieve file start packet");
+//		}
+		//Sends and acknowledgment after receiving the initial request
+		ackArray[1] = SicNetworkProtocol.ackFileStart;
+		listener.send(ack);
 		
+		
+		int fileSize = SicNetworkProtocol.getFileSize(dataIN);
+
 		char[] rPath = new char[95];
 		for (int i = 0; i < 95; ++i) {
-//			System.out.print((char)dataIN[7+i]);
 			rPath[i] = (char) dataIN[7+i];
 		}
-		String relativePath = String.valueOf(rPath);
-		System.out.println("Relative Path: "+relativePath);
+		String relativePath = String.valueOf(rPath).trim();
+		System.out.println("Downloading File: "+relativePath+", it is "+fileSize+" bytes big");
 		
 		int fragments = fileSize / SicNetworkProtocol.dataPacketDataCapacity + 1;
 		fileData = new byte[fileSize];
 		
 		//TODO: keep track of which fragments received so far
 		
+		
 		//download all fragments
-		for (int fragID = 0; fragID < fragments; ++fragID) {
-			downloadFragment(fragID);
+		for (int fragNum = 0; fragNum < fragments; ++fragNum) {
+			//TODO: figure out if server is done sending fragments so you can send ack/nack
+			//Receive fragment
+			listener.receive(recvData);
+			
+			if (SicNetworkProtocol.isDataPacket(dataIN)) {
+				processDataFragment();
+			} else {
+				//TODO: do smart stuff like ignoring nacks
+				//Possibly listening for acks
+			}
+			
+			
 		}
 		
 		//TODO: request any missed or damaged packets
 		
-		System.out.print("File Recieved!");
+		/**
+		 * Send nacks whenever we receive a gap in packet numbers is detected or when an unexpected end of file packet is received
+		 * when a end of file packet is received and the client has received all packets then send an ack
+		 * repeat acks until a next message is received from server (beginning of next file transfer)
+		 */
+		
+		System.out.println("\tFile Recieved!");
 		
 		//write data to disk
 		File file = new File(rootPath+"/"+relativePath);
@@ -112,11 +145,11 @@ public class SicDownloader {
 		fileData = null;
 	}
 	
-	public void downloadFragment(int fragID) throws IOException {
+	public void processDataFragment() throws IOException {
 		
-		//Receive fragment
-		listener.receive(recvData);
-//		System.out.println(fragID);
+		
+		int fragID = SicNetworkProtocol.getDataFragmentId(dataIN);
+		
 		//copy data after header to fileData buffer
 		for (int i = 0; i < SicNetworkProtocol.dataPacketDataCapacity; ++i) {
 			
@@ -150,7 +183,6 @@ public class SicDownloader {
 		
 		SicDownloader downloader = new SicDownloader(listener);
 		downloader.initiateFileDownload(cmdIN);
-//		downloader.downloadFile();
 		
 
 	}
