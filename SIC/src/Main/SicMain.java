@@ -55,8 +55,11 @@ public class SicMain {
 		//load the settings file from the disk
 		try {
 			ObjectInputStream settingsReader = new ObjectInputStream(new FileInputStream(new File(settingsPath)));
-		
+	
 			settings = (Settings) settingsReader.readObject();
+			ui = new Gui();			
+			ui.setSettings(settings);
+
 			
 			settingsReader.close();
 		} catch (ClassNotFoundException | FileNotFoundException e) {
@@ -99,11 +102,6 @@ public class SicMain {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		
-		//display the gui
-		ui = new Gui();
-		ui.setSettings(settings);
 		
 	}
 	

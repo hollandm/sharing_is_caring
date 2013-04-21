@@ -60,6 +60,7 @@ public class Settings implements Serializable {
 		System.err.println("UPdated address");
 		this._multicastGroup = _multicastGroup;
 	}
+	
 	public String toString() {
 		return "auto updates: "+_auto_updates_enabled
 				+", multicast group: "+_multicastGroup
