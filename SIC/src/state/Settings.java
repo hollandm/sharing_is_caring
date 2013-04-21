@@ -14,6 +14,7 @@ import java.util.Vector;
 public class Settings implements Serializable {
 
 	private static final long serialVersionUID = 6206847912757795293L;
+	private int delayTime = 15;
 	
 	
 	private boolean _auto_updates_enabled;
@@ -64,5 +65,9 @@ public class Settings implements Serializable {
 				+", multicast group: "+_multicastGroup
 				+", directories: "+_directoriePaths
 				+", revision: "+_revision;
+	}
+	
+	public void updateDelay(int delay){
+		delayTime = delay;
 	}
 }
