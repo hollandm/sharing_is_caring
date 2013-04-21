@@ -220,13 +220,15 @@ public class SicUploader {
 //		String root = "C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/testFiles";
 		
 		Vector<File> filesChanged = new Vector<File>();
+		
 		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.exe"));
 		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test1.exe"));
 		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test2.exe"));
-//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.txt"));
+
+		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.txt"));
 		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image.jpeg"));
-//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image(1).jpeg"));
-//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image(2).jpeg"));
+		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image(1).jpeg"));
+		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image(2).jpeg"));
 		
 		
 //		filesChanged.add(new File("C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.exe"));
