@@ -24,7 +24,7 @@ public class SicMain {
 	
 	public final boolean firstTimeStartup;
 	
-	private Settings settings;
+	private Settings settings;	
 	private ArrayList<Directory> directoryList;
 	
 	private DirectoryMonitor dirMonitor;
@@ -42,7 +42,7 @@ public class SicMain {
 //		System.out.println(settingsPath);
 		
 		
-		//if first run then preform first time setup
+		//if first run then perform first time setup
 		if (!(new File(settingsPath).exists())) {
 			System.out.println("Settings file not detected, performing first time setup");
 			firstTimeStartup = true;
@@ -92,12 +92,14 @@ public class SicMain {
 		//start the network manager
 		NetworkManager netManager = new NetworkManager(components);
 		
+		
 		//start the file monitor if in auto mode
 		try {
 			dirMonitor = new DirectoryMonitor(components);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 		
 		//display the gui
 		ui = new Gui();
@@ -131,7 +133,6 @@ public class SicMain {
 
 	public static void main(String[] args) {
 		SicMain MatthewIsAwesome = new SicMain();
-		
 	}
 
 }

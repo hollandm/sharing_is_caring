@@ -74,9 +74,6 @@ public class FileIO {
 		} catch (IOException e) {
 			
 		}
-		
-		
-		
 	}
 	
 	/** 
