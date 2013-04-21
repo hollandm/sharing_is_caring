@@ -15,6 +15,8 @@ import java.nio.ByteBuffer;
 public final class SicNetworkProtocol {
 
 	public static final int port = 7532;
+	public static final int transferCmdPort = 7533;
+	
 	
 	public static final int cmdPacketSize = 100;		//size of command size 
 	
@@ -46,12 +48,18 @@ public final class SicNetworkProtocol {
 	 * startFile: 		sender is indicating that a file is about to be sent
 	 * 
 	 */
-	public static final byte pushRevision = 1;		//[4 bytes: revision #][4 bytes: # of files]
+	public static final byte pushRevision = 1;		//[4 bytes: revision #][4 bytes: # of files][4 bytes : ip address]
 		public static int getNumFiles(byte[] cmdPacket) {
 			return getIntFromByteArray(cmdPacket,6);
 		}
 		public static void setNumFiles(byte[] cmdPacket, int numFiles) {
 			placeIntInByteArray(cmdPacket, 6, numFiles);
+		}
+		public static String getIP(byte[] cmdPacket) {
+			return "127.0.0.1";	//TODO: get ip
+		}
+		public static void setIP(byte[] cmdPacket, String ip) {
+			//TODO: set ip
 		}
 	
 	public static final byte requestRevision = 2;	//[4 bytes: requested revision #]
