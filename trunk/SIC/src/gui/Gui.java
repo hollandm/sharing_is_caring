@@ -7,12 +7,15 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.net.InetAddress;
 import java.net.InetAddress;
 
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import state.Settings;
@@ -21,7 +24,6 @@ public class Gui implements ActionListener{
 
 	protected Settings setting;
 
-	protected JButton updateButton = new JButton("Update");
 	protected JFrame myFrame = new JFrame();
 	
 	protected int versionID = 0;
@@ -40,7 +42,7 @@ public class Gui implements ActionListener{
 	 * Instance variables for menu
 	 */
 	protected JMenu menu = new JMenu("Menu");
-	protected JRadioButtonMenuItem manualUpdate = new JRadioButtonMenuItem("Manual");
+	protected JRadioButtonMenuItem disableUpdate = new JRadioButtonMenuItem("Disable");
 	protected JRadioButtonMenuItem autoUpdate = new JRadioButtonMenuItem("Auto");
 	protected JMenuBar menuBar = new JMenuBar();
 	protected JMenuItem menuMulticast = new JMenuItem("Manage Multicast Address");
@@ -55,10 +57,11 @@ public class Gui implements ActionListener{
 	protected DelayGui delayGui = new DelayGui();
 	
 	public Gui(){
-		Dimension frameSize = new Dimension(600, 400);
+		Dimension frameSize = new Dimension(450, 250);
 		myFrame.setSize(frameSize);
 		myFrame.setTitle("SIC");
 		myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		myFrame.setResizable(false);
 		
 		// set listener for home button for each of the other GUIs
 		// the home button brings you back to home page (this gui)
@@ -69,8 +72,8 @@ public class Gui implements ActionListener{
 		// split home gui into 3 rows
 		Box mainBox = Box.createVerticalBox();
 		Box row1 = Box.createHorizontalBox();
-		Box row2 = Box.createHorizontalBox();
-		Box row3 = Box.createHorizontalBox();
+		//Box row2 = Box.createHorizontalBox();
+		//Box row3 = Box.createHorizontalBox();
 
 		/**<---------------------Building Menu------------------------>*/
 		
@@ -96,33 +99,20 @@ public class Gui implements ActionListener{
 		autoUpdate = new JRadioButtonMenuItem("Auto Update");
 		autoUpdate.addActionListener(this);
 		autoUpdate.setSelected(true);
-		updateButton.setEnabled(true); // default to auto
-		manualUpdate = new JRadioButtonMenuItem("Manual Update");
-		manualUpdate.addActionListener(this);
+		disableUpdate = new JRadioButtonMenuItem("Disable Update");
+		disableUpdate.addActionListener(this);
 
 		group.add(autoUpdate);
-		group.add(manualUpdate);
+		group.add(disableUpdate);
 		menu.add(autoUpdate);
-		menu.add(manualUpdate);
+		menu.add(disableUpdate);
 
 		myFrame.setJMenuBar(menuBar);		
-
-		/**<-----------------------Row 2---------------------------> */
-
-		// add manual update button
-		row2.add(Box.createHorizontalGlue());
-		row2.add(updateButton);
-		updateButton.addActionListener(this);
-		updateButton.setMaximumSize(new Dimension(200, 100));
-		updateButton.setMinimumSize(new Dimension(200, 100));
-		updateButton.setPreferredSize(new Dimension(200, 100));
-		row2.add(Box.createHorizontalGlue());
 
 		/**<-----------------------Row 3---------------------------> */
 
 		// add information box
 		Box info = Box.createVerticalBox();
-		row3.add(Box.createHorizontalGlue());
 		info.add(updateVersion);
 		updateVersion.setText("Update Version: " + versionID);
 		info.add(multicastAddress);
@@ -132,14 +122,13 @@ public class Gui implements ActionListener{
 		info.add(delayTextBox);
 		delayTextBox.setText("Delay: " + delay + " milliseconds");
 
-		row3.add(info);
+		row1.add(info);
 
 		/**<-------------Add everything to main box-------------------> */
 		
 		mainBox.add(Box.createVerticalGlue());
-		mainBox.add(row2);
+		mainBox.add(row1);
 		mainBox.add(Box.createVerticalGlue());
-		mainBox.add(row3);
 
 		/**<-------------Add everything to top frame-------------------> */
 
@@ -158,10 +147,11 @@ public class Gui implements ActionListener{
 		protected JFormattedTextField addressTextField = new JFormattedTextField();
 
 		public FriendGui(){
-			Dimension frameSize = new Dimension(600, 400);
+			Dimension frameSize = new Dimension(450, 250);
 			myFrame.setSize(frameSize);
 			myFrame.setTitle("Manage Multicast Address");
 			myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			myFrame.setResizable(false);
 
 			// split friend gui into 3 columns
 			Box mainBox = Box.createHorizontalBox();
@@ -216,7 +206,6 @@ public class Gui implements ActionListener{
 			mainBox.add(col3);
 
 			/**<-------------Add everything to top frame-------------------> */
-
 			myFrame.add(mainBox);
 			myFrame.setVisible(false);
 		}
@@ -251,10 +240,12 @@ public class Gui implements ActionListener{
 		protected JFormattedTextField directoryAddress = new JFormattedTextField();
 
 		public FolderGui(){
-			Dimension frameSize = new Dimension(600, 400);
+			Dimension frameSize = new Dimension(450, 250);
 			myFrame.setSize(frameSize);
 			myFrame.setTitle("Manage Shared Directory");
 			myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			myFrame.setResizable(false);
+
 
 			Box mainBox = Box.createHorizontalBox();
 			Box col1 = Box.createVerticalBox();
@@ -334,10 +325,12 @@ public class Gui implements ActionListener{
 		protected int delay = 15;
 
 		public DelayGui(){
-			Dimension frameSize = new Dimension(600, 400);
+			Dimension frameSize = new Dimension(450, 250);
 			myFrame.setSize(frameSize);
 			myFrame.setTitle("Manage Delay Settings");
 			myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			myFrame.setResizable(false);
+
 
 			Box mainBox = Box.createHorizontalBox();
 			Box col1 = Box.createVerticalBox();
@@ -402,8 +395,7 @@ public class Gui implements ActionListener{
 			// set delay
 			if(arg0.getSource() == setDelay){
 				delay = Integer.parseInt(delayTime.getText().trim());
-				//setting.updateDelay(delay);
-				System.err.println("delay updated");
+				setting.updateDelay(delay);
 			}	
 		}
 	}
@@ -421,24 +413,19 @@ public class Gui implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		/**<----------------Update button------------------------>*/
-		// update button updates version number
-		if (arg0.getSource() == updateButton){
-			versionID++;
-			updateVersion.setText("Update Version: " + versionID);
-		}
 		
 		/**<----------------Multicast Gui------------------------>*/
 		// if multicast menu item is selected, open up multicast gui
-		else if(arg0.getSource() == menuMulticast){
+		if(arg0.getSource() == menuMulticast){
 			friend.addressTextField.setValue(friend.addressString);
+			friend.myFrame.setLocation(myFrame.getLocation());
 			friend.myFrame.setVisible(true);
-			folder.myFrame.setVisible(false);
 			myFrame.setVisible(false);
 		}
 		
 		// in multicast gui, if pressed home, go back to main menu
 		else if (arg0.getSource() == friend.homeButton){
+			myFrame.setLocation(friend.myFrame.getLocation());
 			myFrame.setVisible(true);
 			friend.myFrame.setVisible(false);
 			multicastAddress.setText("Multicast address: " + friend.addressString);
@@ -449,13 +436,16 @@ public class Gui implements ActionListener{
 		// if clicked on directory management in menu, open new gui
 		else if(arg0.getSource() == menuDirectory){
 			myFrame.setVisible(false);
-			friend.myFrame.setVisible(false);
+			folder.directoryAddress.setText(folder.addressString);
+			folder.myFrame.setLocation(myFrame.getLocation());
 			folder.myFrame.setVisible(true);
+
 		}
 		
 		// if in directory management, and pressed home, go to home gui
 		// also set text in home gui to reflect any changes
 		else if(arg0.getSource() == folder.homeButton){
+			myFrame.setLocation(folder.myFrame.getLocation());
 			myFrame.setVisible(true);
 			folder.myFrame.setVisible(false);
 			directoryAddress.setText("Directory address: " + folder.addressString);
@@ -463,12 +453,15 @@ public class Gui implements ActionListener{
 
 		/**<----------------Delay Gui------------------------>*/
 
-		// open delay setting gui
+		// open delay gui when delay menu is pressed
 		else if(arg0.getSource() == menuDelayUpdate){
 			myFrame.setVisible(false);
+			delayGui.myFrame.setLocation(myFrame.getLocation());
 			delayGui.delayTime.setText(delayGui.delay + "");
 			delay = delayGui.delay;
 			delayGui.myFrame.setVisible(true);
+			System.err.println("success! delay updated");
+			setting.updateDelay(delay);
 		}
 
 		// update delay string on home page once delay time has been updated
@@ -476,6 +469,7 @@ public class Gui implements ActionListener{
 			delayGui.myFrame.setVisible(false);
 			delay = delayGui.delay;
 			delayTextBox.setText("Delay: " + delay + " milliseconds");
+			myFrame.setLocation(delayGui.myFrame.getLocation());
 			myFrame.setVisible(true);
 		}
 		
@@ -483,11 +477,9 @@ public class Gui implements ActionListener{
 
 		// set toggle for auto update and manual update
 		else if (arg0.getSource() == autoUpdate){
-			updateButton.setEnabled(false);
 			setting.set_auto_updates_enabled(true);
 		}
-		else if (arg0.getSource() == manualUpdate){
-			updateButton.setEnabled(true);
+		else if (arg0.getSource() == disableUpdate){
 			setting.set_auto_updates_enabled(false);
 		}
 	}
