@@ -16,7 +16,7 @@ import file.FileIO;
 public class SicUploader {
 
 	private MulticastSocket dataSocket;
-	private Vector<transferCommander> cmdSockets;
+	private Vector<TransferCommander> cmdSockets;
 	
 	private InetAddress group;
 	private FileIO fio;
@@ -55,7 +55,7 @@ public class SicUploader {
 		System.out.println("Uploading " + filesChanged.size() + " files to peers");
 		
 		//prepare socket to listen for tcp connections
-		cmdSockets = new Vector<transferCommander>();
+		cmdSockets = new Vector<TransferCommander>();
 		ServerSocket responces = new ServerSocket(SicNetworkProtocol.transferCmdPort);
 		responces.setSoTimeout(50);
 		
@@ -72,7 +72,7 @@ public class SicUploader {
 		long waitTime = System.currentTimeMillis() + 1000;
 		while(waitTime > System.currentTimeMillis()){
 			try{
-				transferCommander cmd = new transferCommander(responces.accept());
+				TransferCommander cmd = new TransferCommander(responces.accept());
 				cmd.writer.println(filesChanged.size());
 				
 				cmdSockets.add(cmd);
@@ -113,7 +113,7 @@ public class SicUploader {
 		String relativePath = file.getAbsolutePath().substring(rootPath.length());
 		
 		//send startFile packet
-		for (transferCommander client : cmdSockets) {
+		for (TransferCommander client : cmdSockets) {
 			//send size
 			client.writer.println(fileData.length);
 			
@@ -144,7 +144,7 @@ public class SicUploader {
 		}
 		
 		//TODO: notify client that done sending fragments
-		for (transferCommander c : cmdSockets) {
+		for (TransferCommander c : cmdSockets) {
 			c.writer.println();
 		}
 		
@@ -154,7 +154,7 @@ public class SicUploader {
 		//TODO: handle multiple clients acking
 		System.out.println("Waiting for acks");
 		
-		transferCommander cmd = cmdSockets.firstElement();
+		TransferCommander cmd = cmdSockets.firstElement();
 		
 		while (true) {
 			int rcv = Integer.parseInt(cmd.reader.readLine());

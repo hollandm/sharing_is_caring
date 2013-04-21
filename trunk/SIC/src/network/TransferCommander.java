@@ -12,7 +12,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class transferCommander {
+public class TransferCommander {
 
 	public Socket sock;
 	public PrintWriter writer;
@@ -21,7 +21,7 @@ public class transferCommander {
 	public OutputStream fragWriter;
 	public InputStream fragReader;
 	
-	public transferCommander(Socket socket) throws IOException {
+	public TransferCommander(Socket socket) throws IOException {
 		this.sock = socket;
 		
 		this.writer = new PrintWriter(new BufferedOutputStream(sock.getOutputStream()),true);
