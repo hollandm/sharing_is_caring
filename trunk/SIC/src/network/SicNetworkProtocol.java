@@ -101,6 +101,10 @@ public final class SicNetworkProtocol {
 	}
 
 	public static final byte requestRevision = 2;	//[4 bytes: requested revision #]
+	
+	
+	
+	public static final int fileCompleteAck = -1;
 
 
 
