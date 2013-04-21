@@ -17,7 +17,7 @@ public class SicDownloader {
 	private MulticastSocket dataSocket;
 	
 	
-	private transferCommander cmd;
+	private TransferCommander cmd;
 	
 	
 	private FileIO fio;
@@ -57,7 +57,7 @@ public class SicDownloader {
 		
 		//attempt to connect to the server
 		try {
-			cmd = new transferCommander( new Socket(addr, SicNetworkProtocol.transferCmdPort));
+			cmd = new TransferCommander( new Socket(addr, SicNetworkProtocol.transferCmdPort));
 		} catch (IOException e2) {
 			System.err.println("F#@$!\n");
 			e2.printStackTrace();
