@@ -1,14 +1,11 @@
 package network;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Vector;
@@ -33,19 +30,12 @@ public class SicUploader {
 	private byte[] cmdBuffer;				//command packet buffer
 	private DatagramPacket sendData;
 	
-	private Vector<InetAddress> acksExpected;
-	private DatagramPacket ackPacket;
-	private byte[] ackBuffer;
-	
 	
 	public SicUploader(MulticastSocket listener, InetAddress group) throws SocketException {
 		this.dataSocket = listener;
 		this.dataSocket.setSoTimeout(50);
 		this.group = group;
 		fio = new FileIO();
-		
-		ackBuffer = new byte[SicNetworkProtocol.cmdPacketSize];
-		ackPacket = new DatagramPacket(ackBuffer, SicNetworkProtocol.cmdPacketSize);
 		
 		
 		//Initialize cmd components
@@ -74,7 +64,6 @@ public class SicUploader {
 		for (int i = 0; i < SicNetworkProtocol.cmdPacketSize; ++i) cmdBuffer[i] = 0;
 		//TODO place hosts ip address in packet, InetAddress.getLocalHost().getHostAddress()
 		cmdBuffer[1] = SicNetworkProtocol.pushRevision;
-		SicNetworkProtocol.setNumFiles(cmdBuffer, filesChanged.size());
 		dataSocket.send(cmdPacket);
 
 		
@@ -124,7 +113,6 @@ public class SicUploader {
 		String relativePath = file.getAbsolutePath().substring(rootPath.length());
 		
 		//send startFile packet
-		cmdBuffer[1] = SicNetworkProtocol.startFile;
 		for (transferCommander client : cmdSockets) {
 			//send size
 			client.writer.println(fileData.length);
@@ -142,30 +130,50 @@ public class SicUploader {
 		//send file in fragments
 		for (int fragID = 0; fragmentsNeeded > fragID; ++fragID) {
 			
-			sendFragment(fragID);
+			byte[] frag = formatFragment(fragID);
+			
+			//send the fragment
+			dataSocket.send(sendData);
+			
+			//TODO: Calibrate wait time
+			try {
+				Thread.sleep(15);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
+		
+		//TODO: notify client that done sending fragments
+		for (transferCommander c : cmdSockets) {
+			c.writer.println();
+		}
+		
 		System.out.println("\tFinished sending "+relativePath);
 		
 		
 		//TODO: handle multiple clients acking
 		System.out.println("Waiting for acks");
-		cmdSockets.firstElement().reader.readLine();
-//		while (true) {
-//			int rcv = cmdSockets.firstElement().reader.read();
-//			
-//			if (rcv == 0) {
-//				//ack
-//				break;
-//			} else {
-//				//nack, re-send missed fragment
-//				sendFragment(rcv);
-//			}
-//		}
+		
+		transferCommander cmd = cmdSockets.firstElement();
+		
+		while (true) {
+			int rcv = Integer.parseInt(cmd.reader.readLine());
+			
+			if (rcv == 0) {
+				//ack
+				break;
+			} else {
+				//nack, re-send missed fragment over tcp
+				byte[] frag = formatFragment(rcv);
+				cmd.fragWriter.write(frag);
+				
+			}
+		}
 		
 	}
 	
 	
-	public void sendFragment(int fragID) throws IOException {
+	public byte[] formatFragment(int fragID) throws IOException {
 		
 		//set fragment id number
 		SicNetworkProtocol.setDataFragmentId(fragment, fragID);
@@ -183,8 +191,7 @@ public class SicUploader {
 						= fileData[fragID * SicNetworkProtocol.dataPacketDataCapacity + i];
 			}
 			
-			dataSocket.send(sendData);
-			return;
+			return fragment;
 		}
 		
 		//copy file data to fragment
@@ -194,15 +201,7 @@ public class SicUploader {
 			fragment[SicNetworkProtocol.dataPacketHeaderSize + dataPtr] = fileData[readByte];
 			
 		}
-		
-		//send the fragment
-		dataSocket.send(sendData);
-		//TODO: Calibrate wait time
-		try {
-			Thread.sleep(15);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		return fragment;
 	}
 	
 	/**

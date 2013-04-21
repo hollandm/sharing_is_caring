@@ -5,11 +5,9 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.net.SocketTimeoutException;
 
 
 import file.FileIO;
@@ -72,11 +70,13 @@ public class SicDownloader {
 		
 
 		System.out.println("File Transfer Initiated, reciving "+numFiles+" files");
-		
+
+		dataSocket.setSoTimeout(250);
 		//LETS DOWNLOAD SOME FILES NOW!
 		for (int curFile = 0; numFiles > curFile; ++curFile) {
 			downloadFile();
 		}
+		dataSocket.setSoTimeout(0);
 		
 		
 		
@@ -96,41 +96,63 @@ public class SicDownloader {
 		
 		
 		//TODO: keep track of which fragments received so far
+		int fragmentsExpected = fileSize / SicNetworkProtocol.dataPacketDataCapacity + 1;
+		
+		boolean[] fragsRecived = new boolean[fragmentsExpected];
+		for (int i = 0; i < fragmentsExpected; ++i) fragsRecived[i] = false;
+		int fragsRecivedCount = 0;
 		
 		
 		//download all fragments
-		int fragments = fileSize / SicNetworkProtocol.dataPacketDataCapacity + 1;
-		for (int fragNum = 0; fragNum < fragments; ++fragNum) {
-			//TODO: figure out if server is done sending fragments so you can send ack/nack
+		while (!cmd.reader.ready()) {
+
 			//Receive fragment
+			try {
 			dataSocket.receive(recvData);
-			
-			if (SicNetworkProtocol.isDataPacket(dataIN)) {
-				processDataFragment();
-			} else {
-				//TODO: do smart stuff like ignoring nacks
-				//Possibly listening for acks
+			} catch (SocketTimeoutException e) {
+				continue;
+			}
+			//if the valid hasn't been corrupt then save it
+			if (SicNetworkProtocol.checkChecksum(dataIN)) {
+				int id = processDataFragment();
+				fragsRecived[id] = true;
+				++fragsRecivedCount;
 			}
 			
-			
+		}
+		//chomp the end of file packet
+		cmd.reader.readLine();
+		
+		//request any missed or damaged packets
+		
+		if (fragsRecivedCount < fragmentsExpected) {
+			for (int i = 0; i < fragmentsExpected; ++i) {
+				if (fragsRecived[i] == false) {
+					cmd.writer.println(i);
+					
+					cmd.fragReader.read(dataIN);
+					processDataFragment();
+				}
+			}
 		}
 		
-		//TODO: request any missed or damaged packets
 		
 		//ack the file
 		cmd.writer.println(0);
 		
-		System.out.println("\tFile Recieved!");
 		
 		//write data to disk
 		File file = new File(rootPath+"/"+relativePath);
 		if (!file.exists()) file.createNewFile();
 		fio.writeFile(file, fileData);
 		
+		//clear file buffer
 		fileData = null;
+
+		System.out.println("\tFile Recieved!");
 	}
 	
-	public void processDataFragment() throws IOException {
+	public int processDataFragment() throws IOException {
 		
 		
 		int fragID = SicNetworkProtocol.getDataFragmentId(dataIN);
@@ -151,6 +173,7 @@ public class SicDownloader {
 			
 		}
 		
+		return fragID;
 	}
 	
 	/**

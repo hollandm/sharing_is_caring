@@ -27,6 +27,8 @@ public final class SicNetworkProtocol {
 		//next 4 bytes go to revision #
 		//next 4 bytes goes to file #
 		//next 4 bytes goes to fragment #
+		//next 4 bytes contain the checksum
+	
 	public static final int dataPacketSize = 1000;	//maximum size of a data packet
 	public static final int dataPacketDataCapacity = dataPacketSize - dataPacketHeaderSize;	//how much left over space is there with header
 
@@ -48,39 +50,17 @@ public final class SicNetworkProtocol {
 	 * startFile: 		sender is indicating that a file is about to be sent
 	 * 
 	 */
-	public static final byte pushRevision = 1;		//[4 bytes: revision #][4 bytes: # of files][4 bytes : ip address]
-		public static int getNumFiles(byte[] cmdPacket) {
-			return getIntFromByteArray(cmdPacket,6);
-		}
-		public static void setNumFiles(byte[] cmdPacket, int numFiles) {
-			placeIntInByteArray(cmdPacket, 6, numFiles);
-		}
+	public static final byte pushRevision = 1;		//[4 bytes: revision #][4 bytes : ip address]
 		public static String getIP(byte[] cmdPacket) {
 			return "127.0.0.1";	//TODO: get ip
 		}
-		public static void setIP(byte[] cmdPacket, String ip) {
+		public static void setIP(byte[] cmdPacket) {
+			//use local host
 			//TODO: set ip
 		}
 	
 	public static final byte requestRevision = 2;	//[4 bytes: requested revision #]
 	
-	public static final byte startFile = 50;		//[4 bytes: size of file in bytes][95 bytes: file path]
-		public static int getFileSize(byte[] cmdPacket) {
-			return getIntFromByteArray(cmdPacket, 2);
-		}
-		public static void setFileSize(byte[] cmdPacket, int size) {
-			placeIntInByteArray(cmdPacket, 2, size);
-		}
-	
-
-
-	public static final byte ackTransfer  = 60;
-		
-	public static final byte ackFileStart    = 70;	//[4 bytes: file #]
-	public static final byte ackFileRecieve  = 75;	//[4 bytes: file #]
-	
-	public static final byte nackFragment = 80;	//[4 bytes: file #][4 bytes: fragment #]
-		
 	
 	
 	/**
@@ -104,9 +84,14 @@ public final class SicNetworkProtocol {
 	}
 	
 	
-	public static boolean isDataPacket(byte[] packet) {
-		return (packet[0] == 1);
+	public static void generateChecksum(byte[] fragment) {
+		//TODO: do this
 	}
+	public static boolean checkChecksum(byte[] fragment) {
+		//TODO: do this
+		return  true;
+	}
+
 	
 	private static int getIntFromByteArray(byte[] array, int location) {
 		
