@@ -63,6 +63,7 @@ public class SicUploader {
 		//send cmdBuffer packet notifying of revision update
 		for (int i = 0; i < SicNetworkProtocol.cmdPacketSize; ++i) cmdBuffer[i] = 0;
 		//TODO place hosts ip address in packet, InetAddress.getLocalHost().getHostAddress()
+		SicNetworkProtocol.setIP(cmdBuffer);
 		cmdBuffer[1] = SicNetworkProtocol.pushRevision;
 		dataSocket.send(cmdPacket);
 
@@ -85,7 +86,7 @@ public class SicUploader {
 		}
 		
 		//update fragment header with current revision number
-		//TODO: implement revison numbers, currently always recvision 0
+		//TODO: implement revision numbers, currently always revision 0
 		
 		//loop through files
 		int fileCounter = 0;
@@ -119,8 +120,7 @@ public class SicUploader {
 			
 			//send relative path
 			client.writer.println(relativePath);
-			
-			//TODO: send checksum
+		
 		}
 		
 		System.out.println("File sent: "+relativePath+ ", " +fileData.length + " Bytes via " + fragmentsNeeded + " fragments." );
@@ -137,42 +137,49 @@ public class SicUploader {
 			
 			//TODO: Calibrate wait time
 			try {
-				Thread.sleep(15);
+				Thread.sleep(5);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 		
-		//TODO: notify client that done sending fragments
+		//notify client that done sending fragments
 		for (TransferCommander c : cmdSockets) {
 			c.writer.println();
 		}
 		
-		System.out.println("\tFinished sending "+relativePath);
-		
-		
-		//TODO: handle multiple clients acking
-		System.out.println("Waiting for acks");
-		
-		TransferCommander cmd = cmdSockets.firstElement();
-		
-		while (true) {
-			int rcv = Integer.parseInt(cmd.reader.readLine());
-			
-			if (rcv == 0) {
-				//ack
-				break;
-			} else {
-				//nack, re-send missed fragment over tcp
-				byte[] frag = formatFragment(rcv);
-				cmd.fragWriter.write(frag);
+		System.out.println("\tFinished sending " + relativePath + " waiting for acks");
+
+		//go through every client ask for an ack or process there nacks
+		//TODO: optimize ack loop
+		for (TransferCommander cmd : cmdSockets) {
+
+			ackLoop:
+			while (true) {
+				int rcv = Integer.parseInt(cmd.reader.readLine());
 				
+				if (rcv == SicNetworkProtocol.fileCompleteAck) {
+					//ack
+					break ackLoop;
+				} else {
+					//nack, re-send missed fragment over tcp
+					byte[] frag = formatFragment(rcv);
+					cmd.fragWriter.write(frag);
+					cmd.writer.println();
+					
+				}
 			}
 		}
 		
 	}
 	
 	
+	/**
+	 * this class creates a fragment 
+	 * @param fragID
+	 * @return
+	 * @throws IOException
+	 */
 	public byte[] formatFragment(int fragID) throws IOException {
 		
 		//set fragment id number
@@ -204,34 +211,30 @@ public class SicUploader {
 		return fragment;
 	}
 	
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
+
 	public static void main(String[] args) throws IOException {
 		
 
 //		
-//		String root = "E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/";
-		String root = "C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/testFiles";
+		String root = "E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/";
+//		String root = "C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/testFiles";
 		
 		Vector<File> filesChanged = new Vector<File>();
-//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.exe"));
-//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test1.exe"));
-//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test2.exe"));
+		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.exe"));
+		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test1.exe"));
+		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test2.exe"));
 //		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.txt"));
-		
-//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image.jpeg"));
-//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/0.txt"));
+		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image.jpeg"));
 //		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image(1).jpeg"));
 //		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image(2).jpeg"));
-		filesChanged.add(new File("C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.exe"));
-		filesChanged.add(new File("C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.txt"));
-		filesChanged.add(new File("C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image.jpeg"));
+		
+		
+//		filesChanged.add(new File("C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.exe"));
+//		filesChanged.add(new File("C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.txt"));
+//		filesChanged.add(new File("C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image.jpeg"));
 		
 		
 		MulticastSocket listener = new MulticastSocket (SicNetworkProtocol.port);
-//		group = InetAddress.getByName("224.0.0.1");
 		InetAddress group = InetAddress.getByName("230.0.0.10");
 		listener.joinGroup(group); //join the multicast group
 		
