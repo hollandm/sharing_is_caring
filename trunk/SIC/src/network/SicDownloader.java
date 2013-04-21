@@ -5,45 +5,40 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+
 
 import file.FileIO;
 
 public class SicDownloader {
 
-	private MulticastSocket listener;
+	private MulticastSocket dataSocket;
+	
+	
+	private transferCommander cmd;
+	
+	
 	private FileIO fio;
 	
 	byte[] dataIN;
-	byte[] ackArray;
 	DatagramPacket recvData;
-	DatagramPacket ack;
 
 	String rootPath;
 	
 	private byte[] fileData;
 	
 	public SicDownloader(MulticastSocket listener) {
-		ackArray = new byte[SicNetworkProtocol.cmdPacketSize];
-		ackArray[0] = 0;
-		
-		
-		for (int i = 1; i < SicNetworkProtocol.cmdPacketSize; ++i) ackArray[i] = 1;
-		ack = new DatagramPacket(ackArray, SicNetworkProtocol.cmdPacketSize);
-		try {
-			ack.setAddress(InetAddress.getByName("230.0.0.10"));
-		} catch (UnknownHostException e1) {
-			e1.printStackTrace();
-		}
-		//TODO use ip from settings
 		
 		try {
 			listener.setReceiveBufferSize(SicNetworkProtocol.dataPacketSize);
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
-		this.listener = listener;
+		this.dataSocket = listener;
 
 		dataIN = new byte[SicNetworkProtocol.dataPacketSize]; 
 		recvData = new DatagramPacket(dataIN, SicNetworkProtocol.dataPacketSize);
@@ -55,20 +50,30 @@ public class SicDownloader {
 	public void initiateFileDownload(byte[] initiationPacket) throws IOException {
 		
 		//TODO: initiate rootPath better
-		rootPath = "C:/Users/Matt/Desktop/testFiles";
+//		rootPath = "C:/Users/Matt/Desktop/testFiles";
+		rootPath = "C:/Users/Matthew.Matt-Desktop/Desktop/testFiles";
+		
+		//get the address of host who just sent us a message
+		String addr = SicNetworkProtocol.getIP(initiationPacket);
 		
 		
-		//Sends and acknowledgment after receiving the initial request
-		ackArray[1] = SicNetworkProtocol.ackTransfer;
-		listener.send(ack);
+		//attempt to connect to the server
+		try {
+			cmd = new transferCommander( new Socket(addr, SicNetworkProtocol.transferCmdPort));
+		} catch (IOException e2) {
+			System.err.println("F#@$!\n");
+			e2.printStackTrace();
+			System.exit(0);
+		}
+		
 		
 		//get number of files to download
-		int numFiles = SicNetworkProtocol.getNumFiles(initiationPacket);
+		int numFiles = Integer.parseInt(cmd.reader.readLine());
 		
 
 		System.out.println("File Transfer Initiated, reciving "+numFiles+" files");
 		
-		//download every file
+		//LETS DOWNLOAD SOME FILES NOW!
 		for (int curFile = 0; numFiles > curFile; ++curFile) {
 			downloadFile();
 		}
@@ -79,43 +84,26 @@ public class SicDownloader {
 
 	
 	public void downloadFile() throws IOException {
-		
-		//Receive info packet
-		do {
-			listener.receive(recvData);
-			if (dataIN[1] != SicNetworkProtocol.startFile) {
-				System.err.println("Did not recieve file start packet");
-			}
-		} while (dataIN[1] != SicNetworkProtocol.startFile);
-			
-//		if (dataIN[1] != SicNetworkProtocol.startFile) {
-//			System.err.println("Did not recieve file start packet");
-//		}
-		//Sends and acknowledgment after receiving the initial request
-		ackArray[1] = SicNetworkProtocol.ackFileStart;
-		listener.send(ack);
-		
-		
-		int fileSize = SicNetworkProtocol.getFileSize(dataIN);
 
-		char[] rPath = new char[95];
-		for (int i = 0; i < 95; ++i) {
-			rPath[i] = (char) dataIN[7+i];
-		}
-		String relativePath = String.valueOf(rPath).trim();
+		//find out how big the file we are downloading is, then create the buffer to store it
+		int fileSize = Integer.parseInt(cmd.reader.readLine());
+		fileData = new byte[fileSize];
+		
+		//find out where to save the file
+		String relativePath = cmd.reader.readLine();
+		
 		System.out.println("Downloading File: "+relativePath+", it is "+fileSize+" bytes big");
 		
-		int fragments = fileSize / SicNetworkProtocol.dataPacketDataCapacity + 1;
-		fileData = new byte[fileSize];
 		
 		//TODO: keep track of which fragments received so far
 		
 		
 		//download all fragments
+		int fragments = fileSize / SicNetworkProtocol.dataPacketDataCapacity + 1;
 		for (int fragNum = 0; fragNum < fragments; ++fragNum) {
 			//TODO: figure out if server is done sending fragments so you can send ack/nack
 			//Receive fragment
-			listener.receive(recvData);
+			dataSocket.receive(recvData);
 			
 			if (SicNetworkProtocol.isDataPacket(dataIN)) {
 				processDataFragment();
@@ -129,11 +117,8 @@ public class SicDownloader {
 		
 		//TODO: request any missed or damaged packets
 		
-		/**
-		 * Send nacks whenever we receive a gap in packet numbers is detected or when an unexpected end of file packet is received
-		 * when a end of file packet is received and the client has received all packets then send an ack
-		 * repeat acks until a next message is received from server (beginning of next file transfer)
-		 */
+		//ack the file
+		cmd.writer.println(0);
 		
 		System.out.println("\tFile Recieved!");
 		
@@ -149,6 +134,8 @@ public class SicDownloader {
 		
 		
 		int fragID = SicNetworkProtocol.getDataFragmentId(dataIN);
+		
+//		System.out.println(fragID);
 		
 		//copy data after header to fileData buffer
 		for (int i = 0; i < SicNetworkProtocol.dataPacketDataCapacity; ++i) {
