@@ -2,6 +2,8 @@ package gui;
 
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
@@ -60,12 +62,17 @@ public class Gui implements ActionListener{
 	protected DelayGui delayGui = new DelayGui();
 	
 	protected TrayIcon icon;
+    final PopupMenu popup = new PopupMenu();
+    MenuItem exitItem = new MenuItem("Exit Program");
 	
 	public Gui(){
 		ImageIcon image = new ImageIcon(ClassLoader.getSystemResource("icon.png"));
 		SystemTray st = SystemTray.getSystemTray();
 		icon = new TrayIcon(image.getImage());
+		popup.add(exitItem);
+		exitItem.addActionListener(this);
 		icon.addActionListener(this);
+		icon.setPopupMenu(popup);
 		try{
 			st.add(icon);
 		}
@@ -498,9 +505,14 @@ public class Gui implements ActionListener{
 		else if (arg0.getSource() == disableUpdate){
 			setting.set_auto_updates_enabled(false);
 		}
+		
+		/**<-------------TrayIcon Stuff------------------------>*/
 		else if (arg0.getSource() == icon){
 			myFrame.setVisible(true);
 			myFrame.setState(Frame.NORMAL);
+		}
+		else if (arg0.getSource() == exitItem){
+			System.exit(0);
 		}
 	}
 }
