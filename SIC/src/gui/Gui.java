@@ -1,6 +1,9 @@
 package gui;
 
 import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -56,11 +59,24 @@ public class Gui implements ActionListener{
 	protected FolderGui folder = new FolderGui();
 	protected DelayGui delayGui = new DelayGui();
 	
+	protected TrayIcon icon;
+	
 	public Gui(){
+		ImageIcon image = new ImageIcon(ClassLoader.getSystemResource("icon.png"));
+		SystemTray st = SystemTray.getSystemTray();
+		icon = new TrayIcon(image.getImage());
+		icon.addActionListener(this);
+		try{
+			st.add(icon);
+		}
+		catch(Exception e){
+			System.err.println("System tray unsupported");
+		}
+		
 		Dimension frameSize = new Dimension(450, 250);
 		myFrame.setSize(frameSize);
 		myFrame.setTitle("SIC");
-		myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		myFrame.setResizable(false);
 		
 		// set listener for home button for each of the other GUIs
@@ -150,7 +166,7 @@ public class Gui implements ActionListener{
 			Dimension frameSize = new Dimension(450, 250);
 			myFrame.setSize(frameSize);
 			myFrame.setTitle("Manage Multicast Address");
-			myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			//myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			myFrame.setResizable(false);
 
 			// split friend gui into 3 columns
@@ -243,7 +259,7 @@ public class Gui implements ActionListener{
 			Dimension frameSize = new Dimension(450, 250);
 			myFrame.setSize(frameSize);
 			myFrame.setTitle("Manage Shared Directory");
-			myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			//myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			myFrame.setResizable(false);
 
 
@@ -328,7 +344,7 @@ public class Gui implements ActionListener{
 			Dimension frameSize = new Dimension(450, 250);
 			myFrame.setSize(frameSize);
 			myFrame.setTitle("Manage Delay Settings");
-			myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			//myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			myFrame.setResizable(false);
 
 
@@ -481,6 +497,10 @@ public class Gui implements ActionListener{
 		}
 		else if (arg0.getSource() == disableUpdate){
 			setting.set_auto_updates_enabled(false);
+		}
+		else if (arg0.getSource() == icon){
+			myFrame.setVisible(true);
+			myFrame.setState(Frame.NORMAL);
 		}
 	}
 }

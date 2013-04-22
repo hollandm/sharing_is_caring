@@ -96,8 +96,6 @@ public class SicUploader {
 			fileCounter++;
 			
 		}
-		
-
 	}
 	
 	
@@ -128,7 +126,7 @@ public class SicUploader {
 		
 		
 		//send file in fragments
-		for (int fragID = 0; fragmentsNeeded > fragID; ++fragID) {
+		for (int fragID = 0; fragID < fragmentsNeeded ; ++fragID) {
 			
 			byte[] frag = formatFragment(fragID);
 			
