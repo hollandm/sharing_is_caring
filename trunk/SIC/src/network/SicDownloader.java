@@ -73,7 +73,7 @@ public class SicDownloader {
 
 		dataSocket.setSoTimeout(250);
 		//LETS DOWNLOAD SOME FILES NOW!
-		for (int curFile = 0; numFiles > curFile; ++curFile) {
+		for (int curFile = 0; curFile < numFiles; ++curFile) {
 			downloadFile();
 		}
 		dataSocket.setSoTimeout(0);
@@ -96,7 +96,7 @@ public class SicDownloader {
 		
 		
 		//TODO: keep track of which fragments received so far
-		int fragmentsExpected = fileSize / SicNetworkProtocol.dataPacketDataCapacity + 1;
+		int fragmentsExpected = (int) Math.ceil(fileSize / SicNetworkProtocol.dataPacketDataCapacity);
 		
 		boolean[] fragsRecived = new boolean[fragmentsExpected];
 		for (int i = 0; i < fragmentsExpected; ++i) fragsRecived[i] = false;
