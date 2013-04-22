@@ -66,7 +66,8 @@ public class Gui implements ActionListener{
     MenuItem exitItem = new MenuItem("Exit Program");
 	
 	public Gui(){
-		ImageIcon image = new ImageIcon(ClassLoader.getSystemResource("icon.png"));
+		//ImageIcon image = new ImageIcon(ClassLoader.getSystemResource("icon.png"));
+		ImageIcon image = new ImageIcon(this.getClass().getResource("/resources/icon.png"));
 		SystemTray st = SystemTray.getSystemTray();
 		icon = new TrayIcon(image.getImage());
 		popup.add(exitItem);
