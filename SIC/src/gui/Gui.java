@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.Dimension;
+
 import java.awt.Frame;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
@@ -18,7 +19,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.InetAddress;
-
+import java.net.URL;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -67,9 +68,17 @@ public class Gui implements ActionListener{
 	
 	public Gui(){
 		//ImageIcon image = new ImageIcon(ClassLoader.getSystemResource("icon.png"));
-		ImageIcon image = new ImageIcon(this.getClass().getResource("/resources/icon.png"));
+		//ImageIcon image = new ImageIcon(this.getClass().getResource("/resources/icon.png"));
+		ImageIcon image = new ImageIcon();
+		try {
+			image = new ImageIcon(new URL("http://i.imgur.com/D8IxL.gif"));
+		}
+		catch(Exception e) {
+			
+		}
 		SystemTray st = SystemTray.getSystemTray();
 		icon = new TrayIcon(image.getImage());
+		icon.setImageAutoSize(true);
 		popup.add(exitItem);
 		exitItem.addActionListener(this);
 		icon.addActionListener(this);
