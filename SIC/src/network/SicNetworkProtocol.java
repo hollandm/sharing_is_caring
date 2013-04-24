@@ -1,6 +1,7 @@
 package network;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
 /**
@@ -70,33 +71,36 @@ public final class SicNetworkProtocol {
 	public static String getIP(byte[] cmdPacket) {
 		
 		//extracting the byte representation of the IP address
-		byte[] ip = new byte[4];
-		ip[0] = cmdPacket[IP_POS_IN_CMD];
-		ip[1] = cmdPacket[IP_POS_IN_CMD+1];
-		ip[2] = cmdPacket[IP_POS_IN_CMD+2];
-		ip[3] = cmdPacket[IP_POS_IN_CMD+3];
-				
-//		return ip[0] + "." + ip[1] + "." + ip[2] + "." + ip[3];
+
+		int[] ip = new int[4];
+		for (int i = 0; i < 4; ++i) {
+			ip[i] = cmdPacket[IP_POS_IN_CMD+i];
+			ip[i] = ip[i] & 0xff;
+		}
+		
+		
+		return ip[0] + "." + ip[1] + "." + ip[2] + "." + ip[3];
+//		System.out.println(ip[0] + "." + ip[1] + "." + ip[2] + "." + ip[3]);
 //		return "127.0.0.1";
-		return "192.168.1.113";
+		
 
 	}
 	public static void setIP(byte[] cmdPacket) {
 		
 		//get the ip address of the localhost
-		byte[] ip;
 		try {
-			 ip = InetAddress.getLocalHost().getHostAddress().getBytes();
-		}
-		catch(Exception e) {
-			System.err.println("Unable to find the IP address");
-			ip = ("255.255.255.0").getBytes();
+			byte[] ip = InetAddress.getLocalHost().getAddress();
+
+			//insert the IP address into the packet
+			for(int i = 0; i < 4; i++) {
+				cmdPacket[IP_POS_IN_CMD+i] = ip[i];
+			}
+			
+		} catch (UnknownHostException e1) {
+			e1.printStackTrace();
 		}
 		
-		//insert the IP address into the 
-		for(int i = 0; i < 4; i++) {
-			cmdPacket[IP_POS_IN_CMD+i] = ip[i];
-		}
+		
 		
 
 	}
@@ -139,31 +143,10 @@ public final class SicNetworkProtocol {
 	public static void generateChecksum(byte[] fragment) {
 		
 		//extract the data from the packet
-		byte[] data = new byte[fragment.length - dataPacketHeaderSize];
-		for(int i = 0; i < data.length; i++) {
-			data[i] = fragment[i+dataPacketHeaderSize];
-		}
+		int sum = findChecksum(fragment);
 		
-		//create a variable to hold the checksum
-		byte[] checksum = new byte[4];
-		checksum[0] = 0;
-		checksum[1] = 0;
-		checksum[2] = 0;
-		checksum[3] = 0;
+		placeIntInByteArray(fragment, CHKSUM_TAG, sum);
 		
-		//sum the data into 4 bytes
-		for(int i = 0; i < data.length; i = i+4) {
-			checksum[0] += data[i];
-			checksum[1] += data[i+1];
-			checksum[2] += data[i+2];
-			checksum[3] += data[i+3];			
-		}
-		
-		//place the calculated checksum into the packet
-		fragment[CHKSUM_TAG] = checksum[0];
-		fragment[CHKSUM_TAG+1] = checksum[1];
-		fragment[CHKSUM_TAG+2] = checksum[2];
-		fragment[CHKSUM_TAG+3] = checksum[3];
 
 	}
 	/**
@@ -177,42 +160,23 @@ public final class SicNetworkProtocol {
 	public static boolean checkChecksum(byte[] fragment) {
 		
 		//pull the checksum out of the packet
-		byte[] checksum = new byte[4];
-		checksum[0] = fragment[CHKSUM_TAG];
-		checksum[1] = fragment[CHKSUM_TAG+1];
-		checksum[2] = fragment[CHKSUM_TAG+2];
-		checksum[3] = fragment[CHKSUM_TAG+3];
 		
-		//pull the data out of the packet
-		byte[] data = new byte[fragment.length - dataPacketHeaderSize];
-		for(int i = 0; i < data.length; i++) {
-			data[i] = fragment[i+dataPacketHeaderSize];
-		}
+		int foundSum = findChecksum(fragment);
+		int sentSum = getIntFromByteArray(fragment, CHKSUM_TAG);
 		
-		//create a variable for calculated checksum
-		byte[] check = new byte[4];
-		check[0] = 0;
-		check[1] = 0;
-		check[2] = 0;
-		check[3] = 0;
-		
-		//calculate checksum
-//		for(int i = 0; i < data.length; i = i+4) {
-//			check[0] += data[i];
-//			check[1] += data[i+1];
-//			check[2] += data[i+2];
-//			check[3] += data[i+3];			
-//		}
-		
-		//compare checksums (will be true if and only if each byte matches)
-//		return (checksum[0] == check[0] &&
-//				checksum[1] == check[1] &&
-//				checksum[2] == check[2] &&
-//				checksum[3] == check[3]);
-		
-		return true;
+		return (sentSum == foundSum);
 	}
 
+	private static int findChecksum(byte[] fragment) {
+		int bytesToScan = fragment.length - dataPacketHeaderSize;
+		
+		int sum = 0;
+		for(int i = 0; i < bytesToScan; i++) {
+			sum = (sum + fragment[i+dataPacketHeaderSize]) % (Integer.MAX_VALUE-512);
+		}
+		return sum;
+	}
+	
 
 	private static int getIntFromByteArray(byte[] array, int location) {
 
@@ -229,10 +193,22 @@ public final class SicNetworkProtocol {
 	public static void main(String[] args) {
 
 		byte[] test = new byte[100];
-
-		placeIntInByteArray(test, 10, 200);
-
-		System.out.println(getIntFromByteArray(test, 10));
+		
+		try {
+			System.out.println(InetAddress.getLocalHost().getAddress());
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		setIP(test);
+		String b  = getIP(test);
+		System.out.println(b);
+		
+		
+		
+//		placeIntInByteArray(test, 10, 200);
+//
+//		System.out.println(getIntFromByteArray(test, 10));
 
 	}
 
