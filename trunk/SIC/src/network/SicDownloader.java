@@ -48,7 +48,7 @@ public class SicDownloader {
 	public void initiateFileDownload(byte[] initiationPacket) throws IOException {
 		
 		//TODO: initiate rootPath better
-		rootPath = "C:/Users/Matt/Desktop/testFiles";
+		rootPath = "C:/Users/UPRobotics/Desktop/testFiles";
 //		rootPath = "C:/Users/Matthew.Matt-Desktop/Desktop/testFiles";
 		
 		//get the address of host who just sent us a message
@@ -57,6 +57,7 @@ public class SicDownloader {
 		
 		//attempt to connect to the server
 		try {
+			System.out.println("Attempting to Connect to: "+addr);
 			cmd = new TransferCommander( new Socket(addr, SicNetworkProtocol.transferCmdPort));
 		} catch (IOException e2) {
 			System.err.println("F#@$!\n");
@@ -98,7 +99,7 @@ public class SicDownloader {
 		//TODO: keep track of which fragments received so far
 		int fragmentsExpected = (int) Math.ceil(fileSize / SicNetworkProtocol.dataPacketDataCapacity);
 		
-		boolean[] fragsRecived = new boolean[fragmentsExpected];
+		boolean[] fragsRecived = new boolean[fragmentsExpected+1];
 		for (int i = 0; i < fragmentsExpected; ++i) fragsRecived[i] = false;
 		int fragsRecivedCount = 0;
 		
@@ -115,8 +116,11 @@ public class SicDownloader {
 			//if the valid hasn't been corrupt then save it
 			if (SicNetworkProtocol.checkChecksum(fragReceived)) {
 				int id = processDataFragment();
-				fragsRecived[id] = true;
-				++fragsRecivedCount;
+				System.out.println(""+id);
+				if (id >= 0 && id < fragsRecived.length) {
+					fragsRecived[id] = true;
+					++fragsRecivedCount;
+				}
 			}
 			
 		}

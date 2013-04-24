@@ -77,8 +77,8 @@ public final class SicNetworkProtocol {
 		ip[3] = cmdPacket[IP_POS_IN_CMD+3];
 				
 //		return ip[0] + "." + ip[1] + "." + ip[2] + "." + ip[3];
-		return "127.0.0.1";
-		
+//		return "127.0.0.1";
+		return "192.168.1.113";
 
 	}
 	public static void setIP(byte[] cmdPacket) {
