@@ -62,15 +62,23 @@ public class SicUploader {
 		
 		//send cmdBuffer packet notifying of revision update
 		for (int i = 0; i < SicNetworkProtocol.cmdPacketSize; ++i) cmdBuffer[i] = 0;
-		//TODO place hosts ip address in packet, InetAddress.getLocalHost().getHostAddress()
+
 		SicNetworkProtocol.setIP(cmdBuffer);
 		cmdBuffer[1] = SicNetworkProtocol.pushRevision;
-		dataSocket.send(cmdPacket);
+		for (int i = 0; i < 10; ++i) {
+			dataSocket.send(cmdPacket);
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 
 		
 		//wait for clients to attempt a tcp connection
 		//accept any inbound connections
-		long waitTime = System.currentTimeMillis() + 1000;
+		long waitTime = System.currentTimeMillis() + 5000;
 		while(waitTime > System.currentTimeMillis()){
 			try{
 				TransferCommander cmd = new TransferCommander(responces.accept());
@@ -85,6 +93,12 @@ public class SicUploader {
 			}
 		}
 		
+		if (cmdSockets.size() == 0) {
+			System.out.println("No Clients Found on Network, not sending file");
+			responces.close();
+			return;
+		}
+		
 		//update fragment header with current revision number
 		//TODO: implement revision numbers, currently always revision 0
 		
@@ -96,6 +110,8 @@ public class SicUploader {
 			fileCounter++;
 			
 		}
+		
+
 	}
 	
 	
@@ -126,7 +142,7 @@ public class SicUploader {
 		
 		
 		//send file in fragments
-		for (int fragID = 0; fragID < fragmentsNeeded ; ++fragID) {
+		for (int fragID = 0; fragmentsNeeded > fragID; ++fragID) {
 			
 			byte[] frag = formatFragment(fragID);
 			
@@ -135,7 +151,7 @@ public class SicUploader {
 			
 			//TODO: Calibrate wait time
 			try {
-				Thread.sleep(5);
+				Thread.sleep(15);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -149,7 +165,7 @@ public class SicUploader {
 		System.out.println("\tFinished sending " + relativePath + " waiting for acks");
 
 		//go through every client ask for an ack or process there nacks
-		//TODO: optimize ack loop
+		//TODO: optimize ack loop, don't want to wait for people who are saving a 10 gig file to hard disk
 		for (TransferCommander cmd : cmdSockets) {
 
 			ackLoop:
@@ -196,16 +212,21 @@ public class SicUploader {
 						= fileData[fragID * SicNetworkProtocol.dataPacketDataCapacity + i];
 			}
 			
-			return fragment;
+		} else {
+		
+			//copy file data to fragment
+			for (int dataPtr = 0; dataPtr < SicNetworkProtocol.dataPacketDataCapacity; ++dataPtr) {
+				int readByte =   fragID * SicNetworkProtocol.dataPacketDataCapacity + dataPtr;
+				
+				fragment[SicNetworkProtocol.dataPacketHeaderSize + dataPtr] = fileData[readByte];
+				
+			}
 		}
 		
-		//copy file data to fragment
-		for (int dataPtr = 0; dataPtr < SicNetworkProtocol.dataPacketDataCapacity; ++dataPtr) {
-			int readByte =   fragID * SicNetworkProtocol.dataPacketDataCapacity + dataPtr;
-			
-			fragment[SicNetworkProtocol.dataPacketHeaderSize + dataPtr] = fileData[readByte];
-			
-		}
+		//create a checksum to
+		SicNetworkProtocol.generateChecksum(fragment);
+		
+		
 		return fragment;
 	}
 	
