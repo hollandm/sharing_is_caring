@@ -19,10 +19,7 @@ import file.FileIO;
 public class SicDownloader {
 
 	private MulticastSocket dataSocket;
-	
-	
 	private TransferCommander cmd;
-	
 	
 	private FileIO fio;
 	
@@ -54,11 +51,7 @@ public class SicDownloader {
 	
 	public void initiateFileDownload(byte[] initiationPacket) throws IOException {
 		
-		//TODO: initiate rootPath better but we don't really need to
-		rootPath = components.settings.getDirectoryList().get(0);
-//		rootPath = "C:/Users/matt/Desktop/testFiles";
-//		rootPath = "C:/Users/UPRobotics/Desktop/testFiles";
-//		rootPath = "C:/Users/Matthew.Matt-Desktop/Desktop/testFiles";
+		rootPath = components.settings.getDirectory();
 		
 		//get the address of host who just sent us a message
 		String addr = SicNetworkProtocol.getIP(initiationPacket);
