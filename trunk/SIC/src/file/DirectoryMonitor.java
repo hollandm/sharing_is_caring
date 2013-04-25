@@ -183,29 +183,10 @@ public class DirectoryMonitor implements Runnable {
     }
 
     public void run() {
-        // parse arguments
-//    	String[] args = new String[2];
-//    	args[0] = "-r";
-//    	args[1] = "../..";
-//    			
-//        if (args.length == 0 || args.length > 2)
-//            usage();
-//        boolean recursive = false;
-//        int dirArg = 0;
-//        if (args[0].equals("-r")) {
-//            if (args.length < 2)
-//                usage();
-//            recursive = true;
-//            dirArg++;
-//        }
-
-        // register directory and process its events
-//        Path dir = Paths.get(args[dirArg]);
         Path dir = Paths.get(pathName);
         try {
 			new DirectoryMonitor(dir, recursive).processEvents();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     }
