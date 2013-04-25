@@ -69,9 +69,9 @@ public class SicMain {
 				directory.trim();
 				dirFile = new File(directory);
 			}
-			//if (settingsChanged) {
+			if (settingsChanged) {
 				settings.updateDirectory(directory);
-			//}
+			}
 			
 			components.settings = settings;
 //			components.dirList.add(settings.getDirectory());
