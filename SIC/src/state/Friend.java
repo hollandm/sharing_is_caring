@@ -12,7 +12,6 @@ package state;
 
 import java.io.Serializable;
 import java.net.InetAddress;
-import java.util.ArrayList;
 
 public class Friend implements Serializable {
 
@@ -22,25 +21,37 @@ public class Friend implements Serializable {
 	private String _name;
 	private InetAddress _ip;
 	
-	private ArrayList<Directory> _sharedDirs;
-	
 	public Friend(String name, InetAddress ip){
 		_name = name;
 		_ip = ip;
 	}
 	
+	/**
+	 * Changes the name of the friend
+	 * @param new_name
+	 */
 	public void set_name(String new_name){
 		_name = new_name;
 	}
 	
+	/**
+	 * @return name of the friend
+	 */
 	public String get_name(){
 		return _name;
 	}
 	
+	/**
+	 * Modifies the IP address of a friend
+	 * @param new_ip
+	 */
 	public void set_ip(InetAddress new_ip){
 		_ip = new_ip;
 	}
 	
+	/**
+	 * @return returns the IP address of a friend.
+	 */
 	public InetAddress get_ip(){
 		return _ip;
 	}

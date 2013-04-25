@@ -8,8 +8,6 @@ import java.util.ArrayList;
  * Settings contains the data needed for the program to run
  * 
  */
-
-
 public class Settings implements Serializable {
 
 	private static final long serialVersionUID = 6206847912757795293L;
@@ -28,18 +26,36 @@ public class Settings implements Serializable {
 		_directoriePaths = new ArrayList<String>();
 	}
 	
+	/**
+	 * For now the program will always auto update. We left this in here
+	 * in case we want the program to allow for a manual update button.
+	 * @return
+	 */
 	public boolean is_auto_updates_enabled() {
 		return _auto_updates_enabled;
 	}
 
+	/**
+	 * Enables or disables the auto updating feature.
+	 * @param _auto_updates_enabled
+	 */
 	public void set_auto_updates_enabled(boolean _auto_updates_enabled) {
 		this._auto_updates_enabled = _auto_updates_enabled;
 	}
 
+	/**
+	 * Returns a vector of directories. This allows us to add
+	 * a feature to have more than one directory in sync.
+	 * @return
+	 */
 	public ArrayList<String> getDirectoryList() {
 		return _directoriePaths;
 	}
 
+	/**
+	 * Changes the root folder.
+	 * @param directory
+	 */
 	public void updateDirectory(String directory)
 	{
 		if(_directoriePaths.isEmpty()) {
@@ -55,6 +71,10 @@ public class Settings implements Serializable {
 		return _multicastGroup;
 	}
 	
+	/**
+	 * Changes the multicast ip address.
+	 * @param _multicastGroup
+	 */
 	public void set_multicastGroup(InetAddress _multicastGroup) {
 		System.err.println("UPdated address");
 		this._multicastGroup = _multicastGroup;
@@ -72,6 +92,10 @@ public class Settings implements Serializable {
 		return delayTime;
 	}
 	
+	/**
+	 * Modifies the delay time to avoid congestion.
+	 * @param delay
+	 */
 	public void updateDelay(int delay){
 		delayTime = delay;
 	}

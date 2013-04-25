@@ -37,7 +37,12 @@ public class DirectoryMonitor implements Runnable {
     	return filesRemoved;
     }
     
+    /**
+     * Clears the list of files that have been modified or deleted.
+     * This method should be called after every upload.
+     */
     public void clearVectors(){
+    	//TODO Please call this after uploading to clear the vectors.
     	filesChanged.clear();
     	filesRemoved.clear();
     }
@@ -175,20 +180,20 @@ public class DirectoryMonitor implements Runnable {
 
     public void run() {
         // parse arguments
-    	String[] args = new String[2];
-    	args[0] = "-r";
-    	args[1] = "../..";
-    			
-        if (args.length == 0 || args.length > 2)
-            usage();
-        boolean recursive = false;
-        int dirArg = 0;
-        if (args[0].equals("-r")) {
-            if (args.length < 2)
-                usage();
-            recursive = true;
-            dirArg++;
-        }
+//    	String[] args = new String[2];
+//    	args[0] = "-r";
+//    	args[1] = "../..";
+//    			
+//        if (args.length == 0 || args.length > 2)
+//            usage();
+//        boolean recursive = false;
+//        int dirArg = 0;
+//        if (args[0].equals("-r")) {
+//            if (args.length < 2)
+//                usage();
+//            recursive = true;
+//            dirArg++;
+//        }
 
         // register directory and process its events
 //        Path dir = Paths.get(args[dirArg]);
@@ -201,7 +206,5 @@ public class DirectoryMonitor implements Runnable {
 		}
     }
     
-//    public static void main(String[] args) throws IOException {
-//    }
     
 }
