@@ -24,6 +24,8 @@ public class DirectoryMonitor implements Runnable {
 	private Vector<File> filesChanged  = new Vector<File>();
 	private Vector<File> filesRemoved  = new Vector<File>();
 	private String pathName;
+	
+	private long lastModifiedTime;
 
     @SuppressWarnings("unchecked")
     static <T> WatchEvent<T> cast(WatchEvent<?> event) {
@@ -45,11 +47,17 @@ public class DirectoryMonitor implements Runnable {
     }
     
     /**
+     * @return the time of the last modification 
+     */
+    synchronized public long getLastModTime(){
+    	return lastModifiedTime;
+    }
+    
+    /**
      * Clears the list of files that have been modified or deleted.
      * This method should be called after every upload.
      */
     public void clearVectors(){
-    	//TODO Please call this after uploading to clear the vectors.
     	filesChanged.clear();
     	filesRemoved.clear();
     }
@@ -99,6 +107,7 @@ public class DirectoryMonitor implements Runnable {
     	this.watcher = FileSystems.getDefault().newWatchService();
         this.keys = new HashMap<WatchKey,Path>();
         this.recursive = recursive;
+        lastModifiedTime = System.currentTimeMillis();
 
         if (recursive) {
             System.out.format("Scanning %s ...\n", dir);
@@ -150,10 +159,12 @@ public class DirectoryMonitor implements Runnable {
                 //If the files were newly created or modified then add to the vector.
                 if(event.kind() == ENTRY_CREATE || event.kind() == ENTRY_MODIFY){
                 	filesChanged.add(child.toFile());
+                	lastModifiedTime = System.currentTimeMillis();
                 }
                 
                 //If any file was deleted then add to the corresponding vector.
                 if(event.kind() == ENTRY_DELETE){
+                	lastModifiedTime = System.currentTimeMillis();
                 	filesRemoved.add(child.toFile());
                 }
                 
