@@ -20,6 +20,7 @@ public class DirectoryMonitor implements Runnable {
     private final Map<WatchKey,Path> keys;
     private final boolean recursive;
     private boolean trace = false;
+    private boolean newDir = false;
     
 	private Vector<File> filesChanged  = new Vector<File>();
 	private Vector<File> filesRemoved  = new Vector<File>();
@@ -61,6 +62,15 @@ public class DirectoryMonitor implements Runnable {
     	filesChanged.clear();
     	filesRemoved.clear();
     }
+    
+    /**
+     * Sets the path to the new file path
+     * @param dir
+     */
+    public void setPath(String dir){
+    	pathName = dir;
+    }
+    
 
     /**
      * Register the given directory with the WatchService
