@@ -2,7 +2,6 @@ package network;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 
 /**
  * SicNetworkProtocol is a simple class to store
@@ -20,7 +19,8 @@ public final class SicNetworkProtocol {
 
 
 	public static final int cmdPacketSize = 100;		//size of command size 
-
+	public static final int CMD_TYPE_TAG = 1;
+	
 	public static final int dataPacketHeaderSize = 13;	//Data packet header size
 	public static final int DATA_PACK_TAG = 0;			//first byte says its a data packet
 	public static final int FILE_NUM_TAG = 1;//to 4		//next 4 bytes goes to file #
@@ -58,6 +58,10 @@ public final class SicNetworkProtocol {
 	 */
 	public static final int IP_POS_IN_CMD = 7;//to 10
 
+	public static final byte pullRevision = 2;
+	
+	public static final byte requestRevisionNumber = 3;	//[4 bytes: requested revision #]
+	
 	
 	/**
 	 * getIP returns the IP address contained in the command packet
@@ -100,14 +104,7 @@ public final class SicNetworkProtocol {
 		} catch (UnknownHostException e1) {
 			e1.printStackTrace();
 		}
-		
-		
-		
-
 	}
-
-	public static final byte requestRevision = 2;	//[4 bytes: requested revision #]
-	
 	
 	
 	public static final int fileCompleteAck = -1;
@@ -125,7 +122,10 @@ public final class SicNetworkProtocol {
 		return 0;	
 	}
 
-
+	public static int getCmdType(byte[] cmdPacket) {
+		return cmdPacket[CMD_TYPE_TAG];
+	}
+	
 
 	public static void setDataFragmentId(byte[] dataPacket, int id) {
 		placeIntInByteArray(dataPacket,FRAG_NUM_TAG,id);
