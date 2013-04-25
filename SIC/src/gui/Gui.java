@@ -73,8 +73,10 @@ public class Gui implements ActionListener{
     final PopupMenu popup = new PopupMenu();
     MenuItem exitItem = new MenuItem("Exit Program");
 	
-	public Gui(String directory){
+	public Gui(String directory, InetAddress multicast, int delay){
 		folder.addressString = directory;
+		friend.addressString = multicast.toString();
+		delayGui.delay = delay;
 		
 		// create system tray icon
 		ImageIcon image = new ImageIcon();
@@ -190,7 +192,7 @@ public class Gui implements ActionListener{
 		protected JFrame myFrame = new JFrame();
 		protected JButton homeButton = new JButton("Home");
 		//protected String addressString = "230.0.0.10";
-		protected String addressString = components.settings.get_multicastGroup().toString();
+		protected String addressString;
 		protected JFormattedTextField addressTextField = new JFormattedTextField();
 
 		public FriendGui(){
@@ -263,8 +265,7 @@ public class Gui implements ActionListener{
 		protected JButton setFolderAddressButton = new JButton("Update Folder Directory");
 		protected JFrame myFrame = new JFrame();
 		protected JButton homeButton = new JButton("Home");
-//		protected String addressString = "P:\\Folder";
-		protected String addressString = components.settings.getDirectory();
+		protected String addressString;
 		protected JFormattedTextField directoryAddress = new JFormattedTextField();
 
 		public FolderGui(){
@@ -340,7 +341,7 @@ public class Gui implements ActionListener{
 		protected JFrame myFrame = new JFrame();
 		protected JButton homeButton = new JButton("Home");
 		protected JFormattedTextField delayTime = new JFormattedTextField();
-		protected int delay = components.settings.getDelay();
+		protected int delay;
 
 		public DelayGui(){
 			Dimension frameSize = new Dimension(450, 250);
@@ -412,7 +413,7 @@ public class Gui implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		
-		/**<----------------Multicast Gui------------------------>*/
+		/**<----------------------Multicast Gui--------------------------->*/
 		// if multicast menu item is selected, open up multicast gui
 		if(arg0.getSource() == menuMulticast){
 			friend.addressTextField.setValue(friend.addressString);
@@ -444,9 +445,8 @@ public class Gui implements ActionListener{
 			friend.myFrame.setVisible(false);
 			multicastAddress.setText("Multicast address: " + friend.addressString);
 		}
-
 		
-		/**<----------------Directory Gui------------------------>*/
+		/**<--------------------Directory Gui---------------------------->*/
 
 		// if clicked on directory management in menu, open new gui
 		else if(arg0.getSource() == menuDirectory){
@@ -471,7 +471,7 @@ public class Gui implements ActionListener{
 			directoryAddress.setText("Directory address: " + folder.addressString);
 		}
 
-		/**<----------------Delay Gui------------------------>*/
+		/**<-------------------------Delay Gui-------------------------->*/
 
 		// open delay gui when delay menu is pressed
 		else if(arg0.getSource() == menuDelayUpdate){
@@ -499,7 +499,7 @@ public class Gui implements ActionListener{
 			myFrame.setVisible(true);
 		}
 		
-		/**<----------------Auto/manual update------------------------>*/
+		/**<-----------------Auto/manual update------------------------>*/
 
 		// set toggle for auto update and manual update
 		else if (arg0.getSource() == autoUpdate){
@@ -510,15 +510,20 @@ public class Gui implements ActionListener{
 		}
 		
 		/**<------------------Exit program----------------------------->*/
+		
+		// exits when user chooses to exit program
 		else if (arg0.getSource() == quit){
 			System.exit(0);
 		}
 		
-		/**<-------------TrayIcon Stuff------------------------>*/
+		/**<-----------------TrayIcon Stuff---------------------------->*/
+		// when icon is pressed, brings up the gui again
 		else if (arg0.getSource() == icon){
 			myFrame.setVisible(true);
 			myFrame.setState(Frame.NORMAL);
 		}
+		
+		// right click on icon, chose to quit
 		else if (arg0.getSource() == exitItem){
 			System.exit(0);
 		}
@@ -527,7 +532,7 @@ public class Gui implements ActionListener{
 	/** create and startup a SwingDemo */
 	public static void main(String[] args)
 	{
-		Gui NiceGui = new Gui("c:/desktop");
+		//Gui NiceGui = new Gui("c:/desktop", );
 	}//main
 
 	/** getter method for SicComponents */

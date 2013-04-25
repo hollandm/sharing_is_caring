@@ -30,15 +30,15 @@ public class SicMain {
 	public final boolean firstTimeStartup;
 	
 	private Settings settings;	
-	private ArrayList<Directory> directoryList;
 	
 	private DirectoryMonitor dirMonitor;
+	
 	private Gui ui;
+	
 	private NetworkManager netManager;
 	
 	private Path path;
 	
-	@SuppressWarnings("static-access")
 	public SicMain() {
 
 		SicComponents components = new SicComponents();
@@ -75,7 +75,7 @@ public class SicMain {
 			}
 			
 			components.dirList.add(settings.getDirectory());
-			ui = new Gui(settings.getDirectory());	
+			ui = new Gui(settings.getDirectory(), settings.get_multicastGroup(), settings.getDelay());	
 			components.ui = ui;
 			components.settings = settings;
 			
@@ -121,12 +121,23 @@ public class SicMain {
 		
 		ObjectOutputStream writer;
 		
+		Settings settings = new Settings();
+		
+		// set default multicast address
+		try{
+			settings.set_multicastGroup(InetAddress.getByName("230.0.0.10"));
+		}
+		catch (Exception e){
+	
+		}
+		
+		// set default delay
+		settings.setDelay(15);
+		
+		
+		// set default directory
 		try {
 			writer = new ObjectOutputStream(new FileOutputStream(new File(settingsPath)));
-			
-			Settings settings = new Settings();
-			settings.set_multicastGroup(InetAddress.getByName("230.0.0.10"));
-			settings.setDelay(15);
 			
 			File dirFile;
 			String directory;
@@ -144,7 +155,7 @@ public class SicMain {
 			System.err.println("Failed to generate settings file");
 			System.exit(0);
 		}
-		
+	
 	}
 	
 
