@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import javax.swing.JOptionPane;
 
 
@@ -107,6 +108,7 @@ public class SicMain {
 	}
 
 	public static void main(String[] args) {
+		@SuppressWarnings("unused")
 		SicMain MatthewIsAwesome = new SicMain();
 		
 	}

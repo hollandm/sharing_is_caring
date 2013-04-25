@@ -57,6 +57,8 @@ public class NetworkManager {
 				}
 				
 				if(SicNetworkProtocol.getCmdType(cmdIN) == SicNetworkProtocol.pullRevision) {
+					System.out.println("File Transfer Requested, sending files since revision: ");
+
 					uploader.initateUpload(components.dirMonitor.getFilesChanged(), 
 							components.dirMonitor.getFilesRemoved(), components.settings.getDirectory(),
 							components.settings.getRevision());
