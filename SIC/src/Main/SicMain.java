@@ -112,7 +112,7 @@ public class SicMain {
 		components.netManager = netManager;
 		
 		
-//		netManager.begin();
+		netManager.begin();
 		
 	}
 
