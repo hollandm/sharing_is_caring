@@ -83,7 +83,6 @@ public class SicMain {
 		} 
 		catch (ClassNotFoundException | FileNotFoundException e) {
 			System.err.println("Setting file missing or corrupt");
-			//TODO: notify user and prompt them to fix it
 			e.printStackTrace();
 			System.exit(0);
 		} 
@@ -101,7 +100,7 @@ public class SicMain {
 			
 		//start the file monitor if in auto mode
 		try {
-			path = Paths.get(components.dirList.get(0));
+			path = Paths.get(components.settings.getDirectory());
 			dirMonitor = new DirectoryMonitor(path, true);
 			Thread t1 = new Thread(dirMonitor);
 			t1.start();
@@ -142,6 +141,7 @@ public class SicMain {
 			File dirFile;
 			String directory;
 			do{
+				//Asks the user the directory they want to be synched.
 				directory = JOptionPane.showInputDialog("Please enter a default directory path");
 				directory.trim();
 				dirFile = new File(directory);

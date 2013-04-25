@@ -12,6 +12,10 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+/**
+ * Container for all of our networking components.
+ *
+ */
 public class TransferCommander {
 
 	public Socket sock;
@@ -26,7 +30,6 @@ public class TransferCommander {
 		
 		this.writer = new PrintWriter(new BufferedOutputStream(sock.getOutputStream()),true);
 		this.reader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-		
 		
 		this.fragWriter = sock.getOutputStream();
 		this.fragReader = sock.getInputStream();
