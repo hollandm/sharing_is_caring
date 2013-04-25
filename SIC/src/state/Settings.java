@@ -95,8 +95,10 @@ public class Settings implements Serializable {
 			_directoriePaths.add(directory);
 		}
 		else {
-			_directoriePaths.set(0, directory);
+			_directoriePaths.clear();
+			_directoriePaths.add(directory);
 		}
+		this.saveChanges();
 		System.err.println("UPdated path");
 	}
 	
