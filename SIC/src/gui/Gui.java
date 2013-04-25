@@ -269,7 +269,8 @@ public class Gui implements ActionListener{
 		protected JButton setFolderAddressButton = new JButton("Update Folder Directory");
 		protected JFrame myFrame = new JFrame();
 		protected JButton homeButton = new JButton("Home");
-		protected String addressString = "P:\\Folder";
+//		protected String addressString = "P:\\Folder";
+		protected String addressString = "/Users/VietPhan/Desktop/Jones/";
 		protected JFormattedTextField directoryAddress = new JFormattedTextField();
 
 		public FolderGui(){
@@ -343,6 +344,7 @@ public class Gui implements ActionListener{
 		// set directory address
 		public void actionPerformed(ActionEvent arg0) {
 			if(arg0.getSource() == setFolderAddressButton){
+				//TODO
 				addressString = directoryAddress.getText();
 				setting.updateDirectory(addressString);
 			}			

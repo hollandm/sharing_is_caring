@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 
@@ -31,6 +33,7 @@ public class SicMain {
 	private Gui ui;
 	private NetworkManager netManager;
 	
+	private Path path;
 	
 	
 	public SicMain() {
@@ -73,6 +76,7 @@ public class SicMain {
 			System.exit(0);
 		} 
 		
+		components.settings = settings;
 		
 		//load directories stored in settings file
 		//ensure integrity
@@ -83,7 +87,6 @@ public class SicMain {
 				File dirFile = new File(dirStr);
 				ObjectInputStream dirReader = new ObjectInputStream(new FileInputStream(dirFile));
 				Directory dir = (Directory) dirReader.readObject();
-				directoryList.add(dir);
 			} catch (FileNotFoundException | ClassNotFoundException e) {
 				System.err.println("Directory file missing or corrupt");
 				//TODO: notify user and prompt them to fix it
@@ -98,7 +101,12 @@ public class SicMain {
 		
 		//start the file monitor if in auto mode
 		try {
-			dirMonitor = new DirectoryMonitor(components);
+			//path = Paths.get(components.settings.getDirectoryList().get(0));
+			path = Paths.get("/Users/VietPhan/Desktop/Jones");
+			dirMonitor = new DirectoryMonitor(path, true);
+			Thread t1 = new Thread(dirMonitor);
+			t1.start();
+			System.out.println("Directory added!" + path);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
