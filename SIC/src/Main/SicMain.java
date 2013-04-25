@@ -30,6 +30,7 @@ public class SicMain {
 	
 	private Gui ui;
 	
+	@SuppressWarnings("unused")
 	private NetworkManager netManager;
 	
 	private Path path;
@@ -88,11 +89,8 @@ public class SicMain {
 		} 
 		
 		components.settings = settings;
-
-		//start the network manager
-		NetworkManager netManager = new NetworkManager(components);
-		components.netManager = netManager;
-			
+		
+		
 		//start the file monitor if in auto mode
 		try {
 			path = Paths.get(components.settings.getDirectory());
@@ -105,6 +103,14 @@ public class SicMain {
 		}
 		
 		ui.setComponents(components);
+		
+		//start the network manager
+		NetworkManager netManager = new NetworkManager(components);
+		components.netManager = netManager;
+		
+		
+//		netManager.begin();
+		
 	}
 
 	public static void main(String[] args) {

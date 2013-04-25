@@ -1,9 +1,13 @@
 package network;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.util.Vector;
+
+import state.Settings;
 
 import Main.SicComponents;
 
@@ -21,7 +25,11 @@ import Main.SicComponents;
 
 public class NetworkManager {
 
-//	private SICComponents components;
+	/**
+	 * This is the amount of time to wait after no files have been modified
+	 * before we send off a revision update
+	 */
+	public final int fileWaitTime = 3000;
 	
 	private MulticastSocket listener;
 	private InetAddress group;
@@ -40,7 +48,7 @@ public class NetworkManager {
 	
 	//TODO If autoUpdate is disabled then don't do this!!
 	
-	public void listen() {
+	public void begin() {
 		try {
 
 			byte[] cmdIN = new byte[SicNetworkProtocol.cmdPacketSize];
@@ -50,10 +58,39 @@ public class NetworkManager {
 
 			while (true) {
 
+				
+				if (components.settings.is_auto_updates_enabled()) {
+					
+					if (components.dirMonitor.getLastModTime() > System.currentTimeMillis() + fileWaitTime) {
+						
+						Vector<File> filesRemoved = components.dirMonitor.getFilesRemoved();
+						Vector<File> filesChanged = components.dirMonitor.getFilesChanged();
+						if (!filesRemoved.isEmpty() || !filesChanged.isEmpty()) {
+							
+							System.out.println("Local Changes Detected, sending files since revision: ");
+
+							uploader.initateUpload(components.dirMonitor.getFilesChanged(), 
+									components.dirMonitor.getFilesRemoved(), 
+									components.settings.getDirectory(),
+									components.settings.getRevision());
+							
+							
+							components.dirMonitor.clearVectors();
+							
+						}
+					}
+					
+					
+				}
+				
 				listener.receive(recvCmd); //fills command buffer with data received
 				if(SicNetworkProtocol.getCmdType(cmdIN) == SicNetworkProtocol.pushRevision) {
 					System.out.println("File Transfer Initiated");
 					downloader.initiateFileDownload(cmdIN);
+					
+					//our buffer was just filled with changed caused by downloading files
+					//ignore those
+					components.dirMonitor.clearVectors();
 				}
 				
 				if(SicNetworkProtocol.getCmdType(cmdIN) == SicNetworkProtocol.pullRevision) {
@@ -62,6 +99,9 @@ public class NetworkManager {
 					uploader.initateUpload(components.dirMonitor.getFilesChanged(), 
 							components.dirMonitor.getFilesRemoved(), components.settings.getDirectory(),
 							components.settings.getRevision());
+					
+					components.dirMonitor.clearVectors();
+					
 				}
 				
 				if(SicNetworkProtocol.getCmdType(cmdIN) == SicNetworkProtocol.requestRevisionNumber) {
