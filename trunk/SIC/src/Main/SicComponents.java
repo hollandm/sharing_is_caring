@@ -18,7 +18,6 @@ public class SicComponents {
 
 	public Settings settings;
 	public ArrayList<String> dirList = new ArrayList<String>();
-	
 	public Gui ui;
 	public NetworkManager netManager;
 	public DirectoryMonitor dirMonitor;

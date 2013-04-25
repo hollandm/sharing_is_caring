@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -124,6 +125,8 @@ public class SicMain {
 			writer = new ObjectOutputStream(new FileOutputStream(new File(settingsPath)));
 			
 			Settings settings = new Settings();
+			settings.set_multicastGroup(InetAddress.getByName("230.0.0.10"));
+			settings.setDelay(15);
 			
 			File dirFile;
 			String directory;
@@ -133,7 +136,6 @@ public class SicMain {
 				dirFile = new File(directory);
 			} while(!dirFile.isDirectory());
 			// if directory does not exist, keep prompting user
-
 			settings.updateDirectory(directory);
 			
 			writer.writeObject(settings);
