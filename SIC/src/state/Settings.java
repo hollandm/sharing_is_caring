@@ -69,6 +69,10 @@ public class Settings implements Serializable {
 				+", revision: "+_revision;
 	}
 	
+	public int getDelay() {
+		return delayTime;
+	}
+	
 	public void updateDelay(int delay){
 		delayTime = delay;
 	}

@@ -9,6 +9,10 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
+import state.Settings;
+
+import Main.SicComponents;
+
 
 import file.FileIO;
 
@@ -28,8 +32,9 @@ public class SicDownloader {
 	String rootPath;
 	
 	private byte[] fileData;
+	SicComponents components;
 	
-	public SicDownloader(MulticastSocket listener) {
+	public SicDownloader(MulticastSocket listener, SicComponents components) {
 		
 		try {
 			listener.setReceiveBufferSize(SicNetworkProtocol.dataPacketSize);
@@ -38,6 +43,8 @@ public class SicDownloader {
 		}
 		this.dataSocket = listener;
 
+		this.components = components;
+		
 		fragReceived = new byte[SicNetworkProtocol.dataPacketSize]; 
 		recvData = new DatagramPacket(fragReceived, SicNetworkProtocol.dataPacketSize);
 		
@@ -47,8 +54,9 @@ public class SicDownloader {
 	
 	public void initiateFileDownload(byte[] initiationPacket) throws IOException {
 		
-		//TODO: initiate rootPath better
-		rootPath = "C:/Users/matt/Desktop/testFiles";
+		//TODO: initiate rootPath better but we don't really need to
+		rootPath = components.settings.getDirectoryList().get(0);
+//		rootPath = "C:/Users/matt/Desktop/testFiles";
 //		rootPath = "C:/Users/UPRobotics/Desktop/testFiles";
 //		rootPath = "C:/Users/Matthew.Matt-Desktop/Desktop/testFiles";
 		
@@ -202,8 +210,12 @@ public class SicDownloader {
 		DatagramPacket recvCmd = new DatagramPacket(cmdIN, SicNetworkProtocol.cmdPacketSize); //DatagramPacket for receiving packets of length 10
 		listener.receive(recvCmd); //fills command buffer with data receive
 		
+		SicComponents c = new SicComponents();
+		c.settings = new Settings();
+		c.settings.getDirectoryList().add("C:/Users/matt/Desktop/testFiles");
 		
-		SicDownloader downloader = new SicDownloader(listener);
+		
+		SicDownloader downloader = new SicDownloader(listener,c);
 		downloader.initiateFileDownload(cmdIN);
 		
 
