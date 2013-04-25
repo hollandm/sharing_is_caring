@@ -23,6 +23,7 @@ public class DirectoryMonitor implements Runnable {
     
 	private Vector<File> filesChanged  = new Vector<File>();
 	private Vector<File> filesRemoved  = new Vector<File>();
+	private String pathName;
 
     @SuppressWarnings("unchecked")
     static <T> WatchEvent<T> cast(WatchEvent<?> event) {
@@ -86,7 +87,9 @@ public class DirectoryMonitor implements Runnable {
      * Creates a WatchService and registers the given directory
      */
     public DirectoryMonitor(Path dir, boolean recursive) throws IOException {
-        this.watcher = FileSystems.getDefault().newWatchService();
+        pathName = dir.toString();
+    	
+    	this.watcher = FileSystems.getDefault().newWatchService();
         this.keys = new HashMap<WatchKey,Path>();
         this.recursive = recursive;
 
@@ -100,6 +103,7 @@ public class DirectoryMonitor implements Runnable {
 
         // enable trace after initial registration
         this.trace = true;
+        
     }
 
     /**
@@ -197,7 +201,7 @@ public class DirectoryMonitor implements Runnable {
 
         // register directory and process its events
 //        Path dir = Paths.get(args[dirArg]);
-        Path dir = Paths.get("/Users/VietPhan/Desktop/Jones/");
+        Path dir = Paths.get(pathName);
         try {
 			new DirectoryMonitor(dir, recursive).processEvents();
 		} catch (IOException e) {

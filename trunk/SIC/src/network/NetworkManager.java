@@ -45,7 +45,6 @@ public class NetworkManager {
 			byte[] cmdIN = new byte[SicNetworkProtocol.cmdPacketSize];
 
 			DatagramPacket recvCmd = new DatagramPacket(cmdIN, SicNetworkProtocol.cmdPacketSize); //DatagramPacket for receiving packets of length 10
-
 			System.out.println("Listening to traffic");
 
 			while (true) {

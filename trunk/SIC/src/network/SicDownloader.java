@@ -208,6 +208,7 @@ public class SicDownloader {
 		
 		byte[] cmdIN = new byte[SicNetworkProtocol.cmdPacketSize];
 		DatagramPacket recvCmd = new DatagramPacket(cmdIN, SicNetworkProtocol.cmdPacketSize); //DatagramPacket for receiving packets of length 10
+
 		listener.receive(recvCmd); //fills command buffer with data receive
 		
 		SicComponents c = new SicComponents();
