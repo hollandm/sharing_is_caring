@@ -24,15 +24,18 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import Main.SicComponents;
+
 import state.Settings;
 
 public class Gui implements ActionListener{
-
-	protected Settings setting;
+	
+	protected SicComponents components;
 
 	protected JFrame myFrame = new JFrame();
 	
 	protected int versionID = 0;
+	
 	protected int delay = 15;
 
 	/**
@@ -62,11 +65,16 @@ public class Gui implements ActionListener{
 	protected FolderGui folder = new FolderGui();
 	protected DelayGui delayGui = new DelayGui();
 	
+	/**
+	 * Instance variables for minimizing to tray
+	 */
 	protected TrayIcon icon;
     final PopupMenu popup = new PopupMenu();
     MenuItem exitItem = new MenuItem("Exit Program");
 	
-	public Gui(){
+	public Gui(String directory){
+		folder.addressString = directory;
+		
 		//ImageIcon image = new ImageIcon(ClassLoader.getSystemResource("icon.png"));
 		//ImageIcon image = new ImageIcon(this.getClass().getResource("/resources/icon.png"));
 		ImageIcon image = new ImageIcon();
@@ -105,8 +113,6 @@ public class Gui implements ActionListener{
 		// split home gui into 3 rows
 		Box mainBox = Box.createVerticalBox();
 		Box row1 = Box.createHorizontalBox();
-		//Box row2 = Box.createHorizontalBox();
-		//Box row3 = Box.createHorizontalBox();
 
 		/**<---------------------Building Menu------------------------>*/
 		
@@ -142,7 +148,7 @@ public class Gui implements ActionListener{
 
 		myFrame.setJMenuBar(menuBar);		
 
-		/**<-----------------------Row 3---------------------------> */
+		/**<-----------------------Row 1---------------------------> */
 
 		// add information box
 		Box info = Box.createVerticalBox();
@@ -176,7 +182,7 @@ public class Gui implements ActionListener{
 		protected JButton setMulticastAddressButton = new JButton("Update Multicast Address");
 		protected JFrame myFrame = new JFrame();
 		protected JButton homeButton = new JButton("Home");
-		protected String addressString = "255.255.255.110";
+		protected String addressString = "230.0.0.10";
 		protected JFormattedTextField addressTextField = new JFormattedTextField();
 
 		public FriendGui(){
@@ -251,7 +257,7 @@ public class Gui implements ActionListener{
 				String temp = addressString;// = address.getText();
 				try{
 					addressString = addressTextField.getText();
-					setting.set_multicastGroup(InetAddress.getByName(addressString.trim()));
+					components.settings.set_multicastGroup(InetAddress.getByName(addressString.trim()));
 				}
 				catch (Exception e){
 					JOptionPane jop = new JOptionPane();
@@ -346,7 +352,7 @@ public class Gui implements ActionListener{
 			if(arg0.getSource() == setFolderAddressButton){
 				//TODO
 				addressString = directoryAddress.getText();
-				setting.updateDirectory(addressString);
+				components.settings.updateDirectory(addressString);
 			}			
 		}
 	}
@@ -430,22 +436,11 @@ public class Gui implements ActionListener{
 			// set delay
 			if(arg0.getSource() == setDelay){
 				delay = Integer.parseInt(delayTime.getText().trim());
-				setting.updateDelay(delay);
+				components.settings.updateDelay(delay);
 			}	
 		}
 	}
-
-	/** create and startup a SwingDemo */
-	public static void main(String[] args)
-	{
-		Gui NiceGui = new Gui();
-	}//main
-
-	public void setSettings(Settings newSetting)
-	{
-		setting = newSetting;
-	}
-
+	
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		
@@ -496,7 +491,7 @@ public class Gui implements ActionListener{
 			delay = delayGui.delay;
 			delayGui.myFrame.setVisible(true);
 			System.err.println("success! delay updated");
-			setting.updateDelay(delay);
+			components.settings.updateDelay(delay);
 		}
 
 		// update delay string on home page once delay time has been updated
@@ -512,10 +507,10 @@ public class Gui implements ActionListener{
 
 		// set toggle for auto update and manual update
 		else if (arg0.getSource() == autoUpdate){
-			setting.set_auto_updates_enabled(true);
+			components.settings.set_auto_updates_enabled(true);
 		}
 		else if (arg0.getSource() == disableUpdate){
-			setting.set_auto_updates_enabled(false);
+			components.settings.set_auto_updates_enabled(false);
 		}
 		
 		/**<-------------TrayIcon Stuff------------------------>*/
@@ -526,5 +521,16 @@ public class Gui implements ActionListener{
 		else if (arg0.getSource() == exitItem){
 			System.exit(0);
 		}
+	}
+	
+	/** create and startup a SwingDemo */
+	public static void main(String[] args)
+	{
+		Gui NiceGui = new Gui("c:/desktop");
+	}//main
+
+	/** getter method for SicComponents */
+	public void setComponents(SicComponents comp){
+		components = comp;
 	}
 }
