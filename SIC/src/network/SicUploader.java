@@ -51,7 +51,7 @@ public class SicUploader {
 	
 	
 	
-	public void initateUpload(Vector<File> filesChanged, String directoryPath, int revision) throws IOException {
+	public void initateUpload(Vector<File> filesChanged, Vector<File> filesDeleted, String directoryPath, int revision) throws IOException {
 		System.out.println("Uploading " + filesChanged.size() + " files to peers");
 		
 		//prepare socket to listen for tcp connections
@@ -59,13 +59,12 @@ public class SicUploader {
 		ServerSocket responces = new ServerSocket(SicNetworkProtocol.transferCmdPort);
 		responces.setSoTimeout(50);
 		
-		
 		//send cmdBuffer packet notifying of revision update
 		for (int i = 0; i < SicNetworkProtocol.cmdPacketSize; ++i) cmdBuffer[i] = 0;
 
 		SicNetworkProtocol.setIP(cmdBuffer);
 		cmdBuffer[1] = SicNetworkProtocol.pushRevision;
-		for (int i = 0; i < 10; ++i) {
+		for (int i = 0; i < 30; ++i) {
 			dataSocket.send(cmdPacket);
 			try {
 				Thread.sleep(10);
@@ -97,6 +96,19 @@ public class SicUploader {
 			System.out.println("No Clients Found on Network, not sending file");
 			responces.close();
 			return;
+		}
+		
+		//What files should be deleted
+		for (File delete : filesDeleted) {
+			String relativePath = delete.getAbsolutePath().substring(directoryPath.length());
+			
+			for (TransferCommander client : cmdSockets) {
+				client.writer.println(relativePath);
+			}
+			
+		}
+		for (TransferCommander client : cmdSockets) {
+			client.writer.println();
 		}
 		
 		//update fragment header with current revision number
@@ -239,20 +251,24 @@ public class SicUploader {
 //		String root = "C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/testFiles";
 		
 		Vector<File> filesChanged = new Vector<File>();
+		Vector<File> filesDeleted =  new Vector<File>();
 		
-		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.exe"));
+		filesDeleted.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.exe"));
+		
+//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.exe"));
 		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test1.exe"));
 		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test2.exe"));
 
-		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.txt"));
-		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image.jpeg"));
-		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image(1).jpeg"));
-		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image(2).jpeg"));
+//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.txt"));
+//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image.jpeg"));
+//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image(1).jpeg"));
+//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image(2).jpeg"));
 		
 		
 //		filesChanged.add(new File("C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.exe"));
 //		filesChanged.add(new File("C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.txt"));
 //		filesChanged.add(new File("C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image.jpeg"));
+		
 		
 		
 		MulticastSocket listener = new MulticastSocket (SicNetworkProtocol.port);
@@ -266,7 +282,7 @@ public class SicUploader {
 		}
 		
 		SicUploader uploader = new SicUploader(listener, group);
-		uploader.initateUpload(filesChanged,root,1);
+		uploader.initateUpload(filesChanged, filesDeleted,root,1);
 
 		
 		

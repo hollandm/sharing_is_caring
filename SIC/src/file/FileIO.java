@@ -81,17 +81,25 @@ public class FileIO {
 	 * 
 	 * @param file is the file to be deleted
 	 * 
-	 * @throws FileNotFoundException if the file does not exist
 	 */
 	public void deleteFile(File file) throws FileNotFoundException {
 		
-		if (!file.exists()) {
-			throw new FileNotFoundException("File at "+file.getAbsolutePath()+" was not found");
+		if (file.exists()) {
+			file.delete();
 		}
+//		System.out.println(file.getAbsolutePath());
 		
-		
-		file.delete();
-		
+	}
+	
+	public static void main(String[] args) {
+		FileIO f = new FileIO();
+		try {
+			File F = new File("C:/Users/matt/Desktop/testFiles/test.exe");
+			System.out.println();
+			f.deleteFile(F);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

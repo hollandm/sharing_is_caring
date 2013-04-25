@@ -79,6 +79,7 @@ public final class SicNetworkProtocol {
 		}
 		
 		
+//		return "192.168.1.143";
 		return ip[0] + "." + ip[1] + "." + ip[2] + "." + ip[3];
 //		System.out.println(ip[0] + "." + ip[1] + "." + ip[2] + "." + ip[3]);
 //		return "127.0.0.1";
