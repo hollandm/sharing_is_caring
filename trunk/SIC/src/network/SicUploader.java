@@ -10,6 +10,10 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Vector;
 
+import state.Settings;
+
+import Main.SicComponents;
+
 
 import file.FileIO;
 
@@ -21,7 +25,7 @@ public class SicUploader {
 	private InetAddress group;
 	private FileIO fio;
 	
-	private int fragmentsNeeded;			//number of fragments needed for a fike
+	private int fragmentsNeeded;			//number of fragments needed for a file
 	
 	private byte[] fragment;				//fragment about to be sent
 	private byte[] fileData;				//data read from file
@@ -30,11 +34,13 @@ public class SicUploader {
 	private byte[] cmdBuffer;				//command packet buffer
 	private DatagramPacket sendData;
 	
+	SicComponents components;
 	
-	public SicUploader(MulticastSocket listener, InetAddress group) throws SocketException {
+	public SicUploader(MulticastSocket listener, SicComponents components) throws SocketException {
 		this.dataSocket = listener;
 		this.dataSocket.setSoTimeout(50);
-		this.group = group;
+		this.group = components.settings.get_multicastGroup();
+		this.components = components;
 		fio = new FileIO();
 		
 		
@@ -69,7 +75,6 @@ public class SicUploader {
 			try {
 				Thread.sleep(10);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -77,6 +82,7 @@ public class SicUploader {
 		
 		//wait for clients to attempt a tcp connection
 		//accept any inbound connections
+		//TODO: calibrate wait time
 		long waitTime = System.currentTimeMillis() + 5000;
 		while(waitTime > System.currentTimeMillis()){
 			try{
@@ -107,12 +113,15 @@ public class SicUploader {
 			}
 			
 		}
+		
+		//Signal clients to begin file upload stage
 		for (TransferCommander client : cmdSockets) {
 			client.writer.println();
 		}
 		
 		//update fragment header with current revision number
-		//TODO: implement revision numbers, currently always revision 0
+		SicNetworkProtocol.setDataFragmentId(fragment, revision);
+		
 		
 		//loop through files
 		int fileCounter = 0;
@@ -156,14 +165,15 @@ public class SicUploader {
 		//send file in fragments
 		for (int fragID = 0; fragmentsNeeded > fragID; ++fragID) {
 			
-			byte[] frag = formatFragment(fragID);
+//			byte[] frag = 
+			formatFragment(fragID);
 			
 			//send the fragment
 			dataSocket.send(sendData);
 			
 			//TODO: Calibrate wait time
 			try {
-				Thread.sleep(15);
+				Thread.sleep(components.settings.getDelay());
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -282,10 +292,12 @@ public class SicUploader {
 			e.printStackTrace();
 		}
 		
-		SicUploader uploader = new SicUploader(listener, group);
-		uploader.initateUpload(filesChanged, filesDeleted,root,1);
-
+		SicComponents c = new SicComponents();
+		c.settings = new Settings();
+		c.settings.set_multicastGroup(group);
 		
+		SicUploader uploader = new SicUploader(listener, c);
+		uploader.initateUpload(filesChanged, filesDeleted,root,1);
 		
 	}
 
