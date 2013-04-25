@@ -11,7 +11,7 @@ import java.io.*;
 import java.util.*;
 
 /**
- * Example to watch a directory (or tree) for changes to files.
+ *  Watch a directory and all subdirectories for changes to files.
  */
 
 public class DirectoryMonitor implements Runnable {
@@ -30,10 +30,16 @@ public class DirectoryMonitor implements Runnable {
         return (WatchEvent<T>)event;
     }
     
+    /**
+     * @return a vector of all the modified or newly added files
+     */
     public Vector<File> getFilesChanged() {
     	return filesChanged;
     }
     
+    /**
+     * @return all files that have to be removed
+     */
     public Vector<File> getFilesRemoved(){
     	return filesRemoved;
     }
@@ -52,6 +58,7 @@ public class DirectoryMonitor implements Runnable {
      * Register the given directory with the WatchService
      */
     private void register(Path dir) throws IOException {
+    	//Registers what events to listen for
         WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
         if (trace) {
             Path prev = keys.get(key);
@@ -140,11 +147,12 @@ public class DirectoryMonitor implements Runnable {
                 Path name = ev.context();
                 Path child = dir.resolve(name);
 
-                // print out event
+                //If the files were newly created or modified then add to the vector.
                 if(event.kind() == ENTRY_CREATE || event.kind() == ENTRY_MODIFY){
                 	filesChanged.add(child.toFile());
                 }
                 
+                //If any file was deleted then add to the corresponding vector.
                 if(event.kind() == ENTRY_DELETE){
                 	filesRemoved.add(child.toFile());
                 }
@@ -159,7 +167,6 @@ public class DirectoryMonitor implements Runnable {
                             registerAll(child);
                         }
                     } catch (IOException x) {
-                        // ignore to keep sample readbale
                     }
                 }
             }
@@ -177,12 +184,9 @@ public class DirectoryMonitor implements Runnable {
         }
     }
 
-    static void usage() {
-        System.err.println("usage: java WatchDir [-r] dir");
-        System.exit(-1);
-    }
 
     public void run() {
+    	//runs constantly and handles event through the process events method.
         Path dir = Paths.get(pathName);
         try {
 			new DirectoryMonitor(dir, recursive).processEvents();
