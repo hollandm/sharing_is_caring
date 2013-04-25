@@ -68,7 +68,10 @@ public class SicMain {
 				directory.trim();
 				dirFile = new File(directory);
 			}
-			settings.updateDirectory(directory);
+			if (settingsChanged) {
+				settings.updateDirectory(directory);
+			}
+			
 			
 //			components.dirList.add(settings.getDirectory());
 			ui = new Gui(settings.getDirectory(), settings.get_multicastGroup(), settings.getDelay());	
