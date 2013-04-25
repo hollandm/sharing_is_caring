@@ -60,23 +60,23 @@ public class SicMain {
 			settings = (Settings) settingsReader.readObject();
 			
 			File dirFile = new File(settings.getDirectory());
+			String directory = settings.getDirectory().toString();
+			
 			boolean settingsChanged = false;
-			String directory = "";
 			while (!dirFile.exists() || !dirFile.isDirectory()) {
 				settingsChanged = true;
 				directory = JOptionPane.showInputDialog("Please enter a default directory path");
 				directory.trim();
 				dirFile = new File(directory);
 			}
-			if (settingsChanged) {
+			//if (settingsChanged) {
 				settings.updateDirectory(directory);
-			}
+			//}
 			
-			
-//			components.dirList.add(settings.getDirectory());
-			ui = new Gui(settings.getDirectory(), settings.get_multicastGroup(), settings.getDelay());	
-			components.ui = ui;
 			components.settings = settings;
+//			components.dirList.add(settings.getDirectory());
+			ui = new Gui(components);	
+			components.ui = ui;
 			
 			settingsReader.close();
 		} 
