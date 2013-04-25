@@ -51,7 +51,14 @@ public class Settings implements Serializable {
 	public ArrayList<String> getDirectoryList() {
 		return _directoriePaths;
 	}
-
+	
+	/**
+	 * Returns the first directory in the list of directories
+	 */
+	public String getDirectory(){
+		return _directoriePaths.get(0);
+	}
+	
 	/**
 	 * Changes the root folder.
 	 * @param directory
