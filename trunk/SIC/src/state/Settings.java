@@ -3,7 +3,6 @@ package state;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.Vector;
 
 /**
  * Settings contains the data needed for the program to run

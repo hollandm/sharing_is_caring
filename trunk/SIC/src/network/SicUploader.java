@@ -97,7 +97,7 @@ public class SicUploader {
 				continue;
 			}
 		}
-		
+		responces.close();
 		if (cmdSockets.size() == 0) {
 			System.out.println("No Clients Found on Network, not sending file");
 			responces.close();

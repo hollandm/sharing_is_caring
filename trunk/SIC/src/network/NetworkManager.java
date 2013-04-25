@@ -1,24 +1,11 @@
 package network;
 
-import file.FileIO;
-import gui.Gui;
-
 import java.io.IOException;
-import java.io.EOFException;
-import java.io.File;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.Socket;
-import java.net.SocketException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Vector;
 
 import Main.SicComponents;
-
-import state.Directory;
-import state.Settings;
 
 /**
  * Scans inbound network traffic for SIC data
@@ -64,12 +51,25 @@ public class NetworkManager {
 			while (true) {
 
 				listener.receive(recvCmd); //fills command buffer with data received
-				if(receiveCommand(recvCmd)) {
+				if(SicNetworkProtocol.getCmdType(cmdIN) == SicNetworkProtocol.pushRevision) {
 					System.out.println("File Transfer Initiated");
 					downloader.initiateFileDownload(cmdIN);
 				}
+				
+				if(SicNetworkProtocol.getCmdType(cmdIN) == SicNetworkProtocol.pullRevision) {
 
+					//TODO: upload revisions since 
+					
+				}
+				
+				if(SicNetworkProtocol.getCmdType(cmdIN) == SicNetworkProtocol.requestRevisionNumber) {
 
+					//TODO: respond with most recent revision number
+					
+				}
+
+				//TODO: make a way to retrieve request Revision Number response
+				
 			}
 
 
@@ -82,31 +82,28 @@ public class NetworkManager {
 	public void initalizeConnection() throws IOException {
 		listener = new MulticastSocket (SicNetworkProtocol.port);
 //		group = InetAddress.getByName("224.0.0.1");
-		group = InetAddress.getByName("230.0.0.10");
-		listener.joinGroup(group); //join the multicast group
+//		group = InetAddress.getByName("230.0.0.10");
+		listener.joinGroup(components.settings.get_multicastGroup()); //join the multicast group
 
 		listener.setReceiveBufferSize(SicNetworkProtocol.cmdPacketSize); //sets buffer size to 100
 
 	}
 	
 	public void terminateConnection() throws IOException {
-		listener.leaveGroup(group);
+		listener.leaveGroup(components.settings.get_multicastGroup());
 		listener.close();
 	}
-
 	
+	//TODO: call this when changed in gui
+	public void changeGroup() {
+		try {
 
-	public boolean receiveCommand(DatagramPacket packet) {
-		byte[] data = packet.getData();
-		if(data[1] == SicNetworkProtocol.pushRevision) {
-			return true;
+			listener.leaveGroup(group);
+			listener.joinGroup(components.settings.get_multicastGroup());
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		return false;
-
-	}
-
-
-	
+	}	
 	
 
 }
