@@ -57,6 +57,7 @@ public class Gui implements ActionListener{
 	protected JMenuItem menuMulticast = new JMenuItem("Manage Multicast Address");
 	protected JMenuItem menuDirectory = new JMenuItem("Manage Shared Folder");
 	protected JMenuItem menuDelayUpdate = new JMenuItem("Manage Delay Settings");
+	protected JMenuItem quit = new JMenuItem("Exit Program");
 	
 	/**
 	 * Instance of other GUI's
@@ -75,8 +76,7 @@ public class Gui implements ActionListener{
 	public Gui(String directory){
 		folder.addressString = directory;
 		
-		//ImageIcon image = new ImageIcon(ClassLoader.getSystemResource("icon.png"));
-		//ImageIcon image = new ImageIcon(this.getClass().getResource("/resources/icon.png"));
+		// create system tray icon
 		ImageIcon image = new ImageIcon();
 		try {
 			image = new ImageIcon(new URL("http://i.imgur.com/D8IxL.gif"));
@@ -89,6 +89,8 @@ public class Gui implements ActionListener{
 		icon.setImageAutoSize(true);
 		popup.add(exitItem);
 		exitItem.addActionListener(this);
+		
+		// create popup menu so user can quit program
 		icon.addActionListener(this);
 		icon.setPopupMenu(popup);
 		try{
@@ -98,10 +100,10 @@ public class Gui implements ActionListener{
 			System.err.println("System tray unsupported");
 		}
 		
+		// set gui frame
 		Dimension frameSize = new Dimension(450, 250);
 		myFrame.setSize(frameSize);
 		myFrame.setTitle("SIC");
-		//myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		myFrame.setResizable(false);
 		
 		// set listener for home button for each of the other GUIs
@@ -145,8 +147,13 @@ public class Gui implements ActionListener{
 		group.add(disableUpdate);
 		menu.add(autoUpdate);
 		menu.add(disableUpdate);
+		
+		menu.add(quit);
+		quit.addActionListener(this);
 
-		myFrame.setJMenuBar(menuBar);		
+
+		myFrame.setJMenuBar(menuBar);	
+		
 
 		/**<-----------------------Row 1---------------------------> */
 
@@ -511,6 +518,11 @@ public class Gui implements ActionListener{
 		}
 		else if (arg0.getSource() == disableUpdate){
 			components.settings.set_auto_updates_enabled(false);
+		}
+		
+		/**<------------------Exit program----------------------------->*/
+		else if (arg0.getSource() == quit){
+			System.exit(0);
 		}
 		
 		/**<-------------TrayIcon Stuff------------------------>*/
