@@ -57,7 +57,6 @@ public class NetworkManager {
 				}
 				
 				if(SicNetworkProtocol.getCmdType(cmdIN) == SicNetworkProtocol.pullRevision) {
-					System.out.println("HERE WE ARE");
 					uploader.initateUpload(components.dirMonitor.getFilesChanged(), 
 							components.dirMonitor.getFilesRemoved(), components.settings.getDirectory(),
 							components.settings.getRevision());
