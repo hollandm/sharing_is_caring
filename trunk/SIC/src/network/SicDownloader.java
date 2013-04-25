@@ -48,7 +48,8 @@ public class SicDownloader {
 	public void initiateFileDownload(byte[] initiationPacket) throws IOException {
 		
 		//TODO: initiate rootPath better
-		rootPath = "C:/Users/UPRobotics/Desktop/testFiles";
+		rootPath = "C:/Users/matt/Desktop/testFiles";
+//		rootPath = "C:/Users/UPRobotics/Desktop/testFiles";
 //		rootPath = "C:/Users/Matthew.Matt-Desktop/Desktop/testFiles";
 		
 		//get the address of host who just sent us a message
@@ -72,9 +73,20 @@ public class SicDownloader {
 
 		System.out.println("File Transfer Initiated, reciving "+numFiles+" files");
 
+		//delete these files
+		String delete;
+		while (true) { 
+			delete = cmd.reader.readLine();
+			if (delete.equals("")) break;
+			
+//			System.out.println("Delete this file: " + rootPath+"/"+delete );
+			File del = new File((rootPath+"/"+delete));
+			fio.deleteFile(del);
+		}
+		
 		dataSocket.setSoTimeout(250);
 		//LETS DOWNLOAD SOME FILES NOW!
-		for (int curFile = 0; curFile < numFiles; ++curFile) {
+		for (int curFile = 0; numFiles > curFile; ++curFile) {
 			downloadFile();
 		}
 		dataSocket.setSoTimeout(0);
@@ -97,7 +109,7 @@ public class SicDownloader {
 		
 		
 		//TODO: keep track of which fragments received so far
-		int fragmentsExpected = (int) Math.ceil(fileSize / SicNetworkProtocol.dataPacketDataCapacity);
+		int fragmentsExpected = fileSize / SicNetworkProtocol.dataPacketDataCapacity + 1;
 		
 		boolean[] fragsRecived = new boolean[fragmentsExpected+1];
 		for (int i = 0; i < fragmentsExpected; ++i) fragsRecived[i] = false;
@@ -109,14 +121,14 @@ public class SicDownloader {
 
 			//Receive fragment
 			try {
-			dataSocket.receive(recvData);
+				dataSocket.receive(recvData);
 			} catch (SocketTimeoutException e) {
 				continue;
 			}
 			//if the valid hasn't been corrupt then save it
 			if (SicNetworkProtocol.checkChecksum(fragReceived)) {
 				int id = processDataFragment();
-				System.out.println(""+id);
+//				System.out.println(""+id);
 				if (id >= 0 && id < fragsRecived.length) {
 					fragsRecived[id] = true;
 					++fragsRecivedCount;
@@ -161,18 +173,14 @@ public class SicDownloader {
 		
 		int fragID = SicNetworkProtocol.getDataFragmentId(fragReceived);
 		
-//		System.out.println(fragID);
-		
 		//copy data after header to fileData buffer
 		for (int i = 0; i < SicNetworkProtocol.dataPacketDataCapacity; ++i) {
 			
 			int writeLoc = fragID*(SicNetworkProtocol.dataPacketDataCapacity) + i;
 			
 			if (writeLoc < fileData.length) {
-				//TODO: check header for segment # and place accordingly instead of just placing them in order received.
 				
-				byte bleh = fragReceived[SicNetworkProtocol.dataPacketHeaderSize + i];
-				fileData[writeLoc] = bleh;
+				fileData[writeLoc] = fragReceived[SicNetworkProtocol.dataPacketHeaderSize + i];
 			}
 			
 		}
