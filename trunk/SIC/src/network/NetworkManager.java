@@ -38,6 +38,7 @@ public class NetworkManager {
 //		downloader = new SicDownloader(listener);
 	}
 	
+	//TODO If autoUpdate is disabled then don't do this!!
 	
 	public void listen() {
 		try {
@@ -56,9 +57,9 @@ public class NetworkManager {
 				}
 				
 				if(SicNetworkProtocol.getCmdType(cmdIN) == SicNetworkProtocol.pullRevision) {
-
-					//TODO: upload revisions since 
-					
+					uploader.initateUpload(components.dirMonitor.getFilesChanged(), 
+							components.dirMonitor.getFilesRemoved(), components.settings.getDirectory(),
+							components.settings.getRevision());
 				}
 				
 				if(SicNetworkProtocol.getCmdType(cmdIN) == SicNetworkProtocol.requestRevisionNumber) {

@@ -27,6 +27,23 @@ public class Settings implements Serializable {
 	}
 	
 	/**
+	 * Returns the revision number
+	 * @return
+	 */
+	public int getRevision() {
+		return _revision;
+	}
+
+	/**
+	 * Increments the revision number.
+	 * @param _revision
+	 */
+	public void bumpRevision(int _revision) {
+		this._revision++;
+	}
+	
+	
+	/**
 	 * For now the program will always auto update. We left this in here
 	 * in case we want the program to allow for a manual update button.
 	 * @return
