@@ -132,7 +132,7 @@ public class SicUploader {
 			
 		}
 		
-
+		components.dirMonitor.clearVectors();
 	}
 	
 	
