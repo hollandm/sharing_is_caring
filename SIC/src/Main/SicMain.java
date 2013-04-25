@@ -43,13 +43,14 @@ public class SicMain {
 		SicComponents components = new SicComponents();
 		
 		//Detect if this is the first time the program has been run
-		settingsPath = System.getProperty("user.dir") + "\\SIC.settings";		
+		settingsPath = System.getProperty("user.dir") + "//SIC.settings";		
 		
 		//if first run then perform first time setup
 		if (!(new File(settingsPath).exists())) {
 			System.out.println("Settings file not detected, performing first time setup");
+			Settings settings = Settings.createDefaultSettings();
+			settings.saveChanges();
 			firstTimeStartup = true;
-			firstTimeSetup(settingsPath);
 		} else {
 			firstTimeStartup = false;
 		}
@@ -63,17 +64,16 @@ public class SicMain {
 			
 			File dirFile = new File(settings.getDirectory());
 			boolean settingsChanged = false;
+			String directory = "";
 			while (!dirFile.exists() || !dirFile.isDirectory()) {
 				settingsChanged = true;
-				String directory = JOptionPane.showInputDialog("Please enter a default directory path");
+				directory = JOptionPane.showInputDialog("Please enter a default directory path");
 				directory.trim();
 				dirFile = new File(directory);
-
-				settings.getDirectoryList().clear();
-				settings.getDirectoryList().add(directory);
 			}
+			settings.updateDirectory(directory);
 			
-			components.dirList.add(settings.getDirectory());
+//			components.dirList.add(settings.getDirectory());
 			ui = new Gui(settings.getDirectory(), settings.get_multicastGroup(), settings.getDelay());	
 			components.ui = ui;
 			components.settings = settings;
@@ -110,53 +110,6 @@ public class SicMain {
 		
 		ui.setComponents(components);
 	}
-	
-	/**
-	 * This method creates a settings object and writes it to a file
-	 * @param settingsPath is the location were to write the file to
-	 */
-	public static void firstTimeSetup(String settingsPath) {
-		
-		ObjectOutputStream writer;
-		
-		Settings settings = new Settings();
-		
-		// set default multicast address
-		try{
-			settings.set_multicastGroup(InetAddress.getByName("230.0.0.10"));
-		}
-		catch (Exception e){
-	
-		}
-		
-		// set default delay
-		settings.setDelay(15);
-		
-		
-		// set default directory
-		try {
-			writer = new ObjectOutputStream(new FileOutputStream(new File(settingsPath)));
-			
-			File dirFile;
-			String directory;
-			do{
-				//Asks the user the directory they want to be synched.
-				directory = JOptionPane.showInputDialog("Please enter a default directory path");
-				directory.trim();
-				dirFile = new File(directory);
-			} while(!dirFile.isDirectory());
-			// if directory does not exist, keep prompting user
-			settings.updateDirectory(directory);
-			
-			writer.writeObject(settings);
-			writer.close();
-		} catch (IOException e) {
-			System.err.println("Failed to generate settings file");
-			System.exit(0);
-		}
-	
-	}
-	
 
 	public static void main(String[] args) {
 		SicMain MatthewIsAwesome = new SicMain();

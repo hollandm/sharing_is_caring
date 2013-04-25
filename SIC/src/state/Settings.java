@@ -1,8 +1,16 @@
 package state;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
 
 /**
  * Settings contains the data needed for the program to run
@@ -40,6 +48,7 @@ public class Settings implements Serializable {
 	 */
 	public void bumpRevision(int _revision) {
 		this._revision++;
+		this.saveChanges();
 	}
 	
 	
@@ -58,6 +67,7 @@ public class Settings implements Serializable {
 	 */
 	public void set_auto_updates_enabled(boolean _auto_updates_enabled) {
 		this._auto_updates_enabled = _auto_updates_enabled;
+		this.saveChanges();
 	}
 
 	/**
@@ -102,6 +112,7 @@ public class Settings implements Serializable {
 	public void set_multicastGroup(InetAddress _multicastGroup) {
 		System.err.println("UPdated address");
 		this._multicastGroup = _multicastGroup;
+		this.saveChanges();
 	}
 
 	
@@ -123,5 +134,43 @@ public class Settings implements Serializable {
 	 */
 	public void setDelay(int delay){
 		delayTime = delay;
+		this.saveChanges();
+	}
+	
+	public void saveChanges() {
+		String settingsPath = System.getProperty("user.dir") + "//SIC.settings";		
+		
+		ObjectOutputStream writer;
+		try {
+			writer = new ObjectOutputStream(new FileOutputStream(new File(settingsPath)));
+			writer.writeObject(this);
+			writer.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public static Settings createDefaultSettings() {
+		Settings settings = new Settings();
+		try {
+			settings.set_multicastGroup(InetAddress.getByName("230.0.0.10"));
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		settings.setDelay(15);
+		
+		File dirFile;
+		String directory;
+		do{
+			directory = JOptionPane.showInputDialog("Please enter a default directory path");
+			directory.trim();
+			dirFile = new File(directory);
+		} while(!dirFile.isDirectory());
+		// if directory does not exist, keep prompting user
+		settings.updateDirectory(directory);
+		return settings;
+		
 	}
 }
