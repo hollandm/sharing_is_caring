@@ -259,7 +259,7 @@ public class SicUploader {
 //		
 //		String root = "E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/";
 //		String root = "C:/Users/Matthew.Matt-Desktop/Dropbox/Sophmor Spring Semester/CS 445/testFiles";
-		String root = "/Users/sherryliao_1/desktop";
+//		String root = "/Users/sherryliao_1/desktop";
 		String root  = "/Users/VietPhan/Desktop/Jones/";
 		
 		Vector<File> filesChanged = new Vector<File>();
