@@ -43,9 +43,7 @@ public class SicMain {
 		SicComponents components = new SicComponents();
 		
 		//Detect if this is the first time the program has been run
-		settingsPath = System.getProperty("user.dir") + "\\SIC.settings";
-//		System.out.println(settingsPath);
-		
+		settingsPath = System.getProperty("user.dir") + "\\SIC.settings";		
 		
 		//if first run then perform first time setup
 		if (!(new File(settingsPath).exists())) {
@@ -95,38 +93,13 @@ public class SicMain {
 		} 
 		
 		components.settings = settings;
-		
-		//load directories stored in settings file
-		//ensure integrity
-//		ArrayList<String> dirList = settings.getDirectoryList();
-//		components.dirList = dirList;
-//		components.dirList.add(directory);
-		
-//		for (int i = 0; i < components.dirList.size(); ++i) {
-//			String dirStr = components.dirList.get(i);
-//			try {
-//				File dirFile = new File(dirStr);
-//				if(dirFile.isDirectory()){
-//				//ObjectInputStream dirReader = new ObjectInputStream(new FileInputStream(dirFile));
-//					Directory dir = (Directory) dirReader.readObject();
-//				}
-//			} 
-//			catch (FileNotFoundException | ClassNotFoundException e) {
-//				System.err.println("Directory file missing or corrupt");
-//				
-//				//TODO: notify user and prompt them to fix it
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		
+
 		//start the network manager
 		NetworkManager netManager = new NetworkManager(components);
 		components.netManager = netManager;
 			
 		//start the file monitor if in auto mode
 		try {
-			//path = Paths.get(components.settings.getDirectoryList().get(0));
 			path = Paths.get(components.dirList.get(0));
 			dirMonitor = new DirectoryMonitor(path, true);
 			Thread t1 = new Thread(dirMonitor);
@@ -167,7 +140,6 @@ public class SicMain {
 			writer.close();
 		} catch (IOException e) {
 			System.err.println("Failed to generate settings file");
-//			e.printStackTrace();
 			System.exit(0);
 		}
 		
