@@ -36,7 +36,6 @@ public class Gui implements ActionListener{
 	
 	protected int versionID = 0;
 	
-	protected int delay = 15;
 
 	/**
 	 * Instances of labels for information box. Displays current update version,
@@ -73,10 +72,15 @@ public class Gui implements ActionListener{
     final PopupMenu popup = new PopupMenu();
     MenuItem exitItem = new MenuItem("Exit Program");
 	
-	public Gui(String directory, InetAddress multicast, int delay){
-		folder.addressString = directory;
-		friend.addressString = multicast.toString();
-		delayGui.delay = delay;
+	public Gui(SicComponents comp){
+		components = comp;
+		folder.addressString = components.settings.getDirectory();
+		friend.addressString = components.settings.get_multicastGroup().toString().substring(1);
+		delayGui.delay = components.settings.getDelay();
+		
+		folder.setFolderAddressButton.addActionListener(this);
+		friend.setMulticastAddressButton.addActionListener(this);
+		delayGui.setDelay.addActionListener(this);
 		
 		// create system tray icon
 		ImageIcon image = new ImageIcon();
@@ -153,7 +157,6 @@ public class Gui implements ActionListener{
 		menu.add(quit);
 		quit.addActionListener(this);
 
-
 		myFrame.setJMenuBar(menuBar);	
 		
 
@@ -168,7 +171,7 @@ public class Gui implements ActionListener{
 		info.add(directoryAddress);
 		directoryAddress.setText("Directory address: " + folder.addressString);
 		info.add(delayTextBox);
-		delayTextBox.setText("Delay: " + delay + " milliseconds");
+		delayTextBox.setText("Delay: " + delayGui.delay + " milliseconds");
 
 		row1.add(info);
 
@@ -191,8 +194,7 @@ public class Gui implements ActionListener{
 		protected JButton setMulticastAddressButton = new JButton("Update Multicast Address");
 		protected JFrame myFrame = new JFrame();
 		protected JButton homeButton = new JButton("Home");
-		//protected String addressString = "230.0.0.10";
-		protected String addressString;
+		protected String addressString;// = components.settings.get_multicastGroup().toString();
 		protected JFormattedTextField addressTextField = new JFormattedTextField();
 
 		public FriendGui(){
@@ -265,14 +267,13 @@ public class Gui implements ActionListener{
 		protected JButton setFolderAddressButton = new JButton("Update Folder Directory");
 		protected JFrame myFrame = new JFrame();
 		protected JButton homeButton = new JButton("Home");
-		protected String addressString;
+		protected String addressString;// = components.settings.getDirectory();
 		protected JFormattedTextField directoryAddress = new JFormattedTextField();
 
 		public FolderGui(){
 			Dimension frameSize = new Dimension(450, 250);
 			myFrame.setSize(frameSize);
 			myFrame.setTitle("Manage Shared Directory");
-			//myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			myFrame.setResizable(false);
 
 
@@ -458,7 +459,7 @@ public class Gui implements ActionListener{
 		
 		// set directory address
 		else if(arg0.getSource() == folder.setFolderAddressButton){
-			folder.addressString = directoryAddress.getText();
+			folder.addressString = folder.directoryAddress.getText();
 			components.settings.updateDirectory(folder.addressString);
 		}	
 		
@@ -468,7 +469,7 @@ public class Gui implements ActionListener{
 			myFrame.setLocation(folder.myFrame.getLocation());
 			myFrame.setVisible(true);
 			folder.myFrame.setVisible(false);
-			directoryAddress.setText("Directory address: " + folder.addressString);
+			directoryAddress.setText("Directory address:" + folder.addressString);
 		}
 
 		/**<-------------------------Delay Gui-------------------------->*/
@@ -478,23 +479,21 @@ public class Gui implements ActionListener{
 			myFrame.setVisible(false);
 			delayGui.myFrame.setLocation(myFrame.getLocation());
 			delayGui.delayTime.setText(delayGui.delay + "");
-			delay = delayGui.delay;
 			delayGui.myFrame.setVisible(true);
 			System.err.println("success! delay updated");
-			components.settings.setDelay(delay);
+			components.settings.setDelay(delayGui.delay);
 		}
 
 		// set delay
 		else if(arg0.getSource() == delayGui.setDelay){
-			delay = Integer.parseInt(delayGui.delayTime.getText().trim());
-			components.settings.setDelay(delay);
+			delayGui.delay = Integer.parseInt(delayGui.delayTime.getText());
+			components.settings.setDelay(delayGui.delay);
 		}	
 		
 		// update delay string on home page once delay time has been updated
 		else if(arg0.getSource() == delayGui.homeButton){
 			delayGui.myFrame.setVisible(false);
-			delay = delayGui.delay;
-			delayTextBox.setText("Delay: " + delay + " milliseconds");
+			delayTextBox.setText("Delay: " + delayGui.delay + " milliseconds");
 			myFrame.setLocation(delayGui.myFrame.getLocation());
 			myFrame.setVisible(true);
 		}
