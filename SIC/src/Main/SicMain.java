@@ -61,7 +61,7 @@ public class SicMain {
 	
 			settings = (Settings) settingsReader.readObject();
 			
-			File dirFile = new File(settings.getDirectoryList().get(0));
+			File dirFile = new File(settings.getDirectory());
 			boolean settingsChanged = false;
 			while (!dirFile.exists() || !dirFile.isDirectory()) {
 				settingsChanged = true;
@@ -73,8 +73,8 @@ public class SicMain {
 				settings.getDirectoryList().add(directory);
 			}
 			
-			components.dirList.add(settings.getDirectoryList().get(0));
-			ui = new Gui(settings.getDirectoryList().get(0));	
+			components.dirList.add(settings.getDirectory());
+			ui = new Gui(settings.getDirectory());	
 			components.ui = ui;
 			components.settings = settings;
 			
