@@ -19,7 +19,6 @@ import gui.Gui;
 
 import network.NetworkManager;
 
-import state.Directory;
 import state.Settings;
 
 
