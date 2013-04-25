@@ -10,11 +10,9 @@ import java.io.IOException;
 
 /**
  * FileIO class contains the methods to read and write data
- * to the syced directory(s).
+ * to the synced directory(s).
  * 
  */
-
-
 public class FileIO {
 
 	/**
@@ -27,6 +25,7 @@ public class FileIO {
 	 */
 	public byte[] readFile(File file) throws FileNotFoundException {
 		
+		//Checks to see if the file exists.
 		if (!file.exists()) {
 			throw new FileNotFoundException("File at "+file.getAbsolutePath()+" was not found");
 		}
@@ -36,7 +35,7 @@ public class FileIO {
 		DataInputStream in;
 		try {
 			in = new DataInputStream(new BufferedInputStream(new FileInputStream(file.getAbsolutePath())));
-			
+			//converts the file into a byte array
 			data = new byte[in.available()];
 			in.readFully(data);
 			
@@ -59,7 +58,7 @@ public class FileIO {
 	 */
 	public void writeFile(File file, byte[] data) throws IOException {
 		
-
+		//If file hasn't been created yet, create it.
 		if (!file.exists()) {
 			file.createNewFile();
 		}
@@ -67,7 +66,7 @@ public class FileIO {
 		DataOutputStream out = null;
 		try {
 			out = new DataOutputStream(new FileOutputStream(file));
-
+			//Writes file
 			for (byte i : data) {
 				out.writeByte(i);
 			}
@@ -82,23 +81,9 @@ public class FileIO {
 	 * @param file is the file to be deleted
 	 * 
 	 */
-	public void deleteFile(File file) throws FileNotFoundException {
-		
+	public void deleteFile(File file) throws FileNotFoundException {	
 		if (file.exists()) {
 			file.delete();
-		}
-//		System.out.println(file.getAbsolutePath());
-		
-	}
-	
-	public static void main(String[] args) {
-		FileIO f = new FileIO();
-		try {
-			File F = new File("C:/Users/matt/Desktop/testFiles/test.exe");
-			System.out.println();
-			f.deleteFile(F);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		}
 	}
 
