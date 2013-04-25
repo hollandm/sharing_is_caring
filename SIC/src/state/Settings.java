@@ -99,11 +99,12 @@ public class Settings implements Serializable {
 		return delayTime;
 	}
 	
+	
 	/**
 	 * Modifies the delay time to avoid congestion.
 	 * @param delay
 	 */
-	public void updateDelay(int delay){
+	public void setDelay(int delay){
 		delayTime = delay;
 	}
 }

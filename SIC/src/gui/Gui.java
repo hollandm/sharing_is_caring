@@ -184,12 +184,13 @@ public class Gui implements ActionListener{
 
 	// inner class
 
-	class FriendGui implements ActionListener{
+	class FriendGui{
 
 		protected JButton setMulticastAddressButton = new JButton("Update Multicast Address");
 		protected JFrame myFrame = new JFrame();
 		protected JButton homeButton = new JButton("Home");
-		protected String addressString = "230.0.0.10";
+		//protected String addressString = "230.0.0.10";
+		protected String addressString = components.settings.get_multicastGroup().toString();
 		protected JFormattedTextField addressTextField = new JFormattedTextField();
 
 		public FriendGui(){
@@ -219,7 +220,6 @@ public class Gui implements ActionListener{
 			setMulticastAddressButton.setMaximumSize(new Dimension(200, 100));
 			setMulticastAddressButton.setMinimumSize(new Dimension(200, 100));
 			setMulticastAddressButton.setPreferredSize(new Dimension(200, 100));
-			setMulticastAddressButton.addActionListener(this);
 
 			// add multicast text field
 			Box addressBox = Box.createHorizontalBox();
@@ -256,34 +256,15 @@ public class Gui implements ActionListener{
 			myFrame.setVisible(false);
 		}
 
-
-		@Override
-		// set multicast address only if it is a valid one
-		public void actionPerformed(ActionEvent arg0) {
-			if(arg0.getSource() == setMulticastAddressButton){
-				String temp = addressString;// = address.getText();
-				try{
-					addressString = addressTextField.getText();
-					components.settings.set_multicastGroup(InetAddress.getByName(addressString.trim()));
-				}
-				catch (Exception e){
-					JOptionPane jop = new JOptionPane();
-					jop.showMessageDialog(myFrame,"Invalid IP address: "+addressString,"AAAAAAAAAAAAAAAAAAAAAAAH!",0);
-					addressString = temp;
-					addressTextField.setText(addressString);
-				}
-			}			
-		}
-
 	}
 
-	class FolderGui implements ActionListener{
+	class FolderGui{
 
 		protected JButton setFolderAddressButton = new JButton("Update Folder Directory");
 		protected JFrame myFrame = new JFrame();
 		protected JButton homeButton = new JButton("Home");
 //		protected String addressString = "P:\\Folder";
-		protected String addressString = "/Users/VietPhan/Desktop/Jones/";
+		protected String addressString = components.settings.getDirectory();
 		protected JFormattedTextField directoryAddress = new JFormattedTextField();
 
 		public FolderGui(){
@@ -314,7 +295,6 @@ public class Gui implements ActionListener{
 			setFolderAddressButton.setMaximumSize(new Dimension(200, 100));
 			setFolderAddressButton.setMinimumSize(new Dimension(200, 100));
 			setFolderAddressButton.setPreferredSize(new Dimension(200, 100));
-			setFolderAddressButton.addActionListener(this);
 
 			
 			// add directory address text field
@@ -352,25 +332,15 @@ public class Gui implements ActionListener{
 			myFrame.add(mainBox);
 			myFrame.setVisible(false);
 		}
-
-		@Override
-		// set directory address
-		public void actionPerformed(ActionEvent arg0) {
-			if(arg0.getSource() == setFolderAddressButton){
-				//TODO
-				addressString = directoryAddress.getText();
-				components.settings.updateDirectory(addressString);
-			}			
-		}
 	}
 
-	class DelayGui implements ActionListener{
+	class DelayGui{
 
 		protected JButton setDelay = new JButton("Update Delay");
 		protected JFrame myFrame = new JFrame();
 		protected JButton homeButton = new JButton("Home");
 		protected JFormattedTextField delayTime = new JFormattedTextField();
-		protected int delay = 15;
+		protected int delay = components.settings.getDelay();
 
 		public DelayGui(){
 			Dimension frameSize = new Dimension(450, 250);
@@ -398,7 +368,6 @@ public class Gui implements ActionListener{
 			setDelay.setMaximumSize(new Dimension(200, 100));
 			setDelay.setMinimumSize(new Dimension(200, 100));
 			setDelay.setPreferredSize(new Dimension(200, 100));
-			setDelay.addActionListener(this);
 
 			// add delay text field
 			Box addressBox = Box.createHorizontalBox();
@@ -438,14 +407,6 @@ public class Gui implements ActionListener{
 			myFrame.setVisible(false);
 		}
 
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			// set delay
-			if(arg0.getSource() == setDelay){
-				delay = Integer.parseInt(delayTime.getText().trim());
-				components.settings.updateDelay(delay);
-			}	
-		}
 	}
 	
 	@Override
@@ -460,6 +421,22 @@ public class Gui implements ActionListener{
 			myFrame.setVisible(false);
 		}
 		
+		// set multicast address only if it is a valid one
+		else if(arg0.getSource() == friend.setMulticastAddressButton){
+			String temp = friend.addressString;// = address.getText();
+			try{
+				friend.addressString = friend.addressTextField.getText();
+				components.settings.set_multicastGroup(
+						InetAddress.getByName(friend.addressString.trim()));
+			}
+			catch (Exception e){
+				JOptionPane.showMessageDialog(myFrame,"Invalid IP address: "
+						+ friend.addressString,"AAAAAAAAAAAAAAAAAAAAAAAH!",0);
+				friend.addressString = temp;
+				friend.addressTextField.setText(friend.addressString);
+			}
+		}	
+		
 		// in multicast gui, if pressed home, go back to main menu
 		else if (arg0.getSource() == friend.homeButton){
 			myFrame.setLocation(friend.myFrame.getLocation());
@@ -468,6 +445,7 @@ public class Gui implements ActionListener{
 			multicastAddress.setText("Multicast address: " + friend.addressString);
 		}
 
+		
 		/**<----------------Directory Gui------------------------>*/
 
 		// if clicked on directory management in menu, open new gui
@@ -476,8 +454,13 @@ public class Gui implements ActionListener{
 			folder.directoryAddress.setText(folder.addressString);
 			folder.myFrame.setLocation(myFrame.getLocation());
 			folder.myFrame.setVisible(true);
-
 		}
+		
+		// set directory address
+		else if(arg0.getSource() == folder.setFolderAddressButton){
+			folder.addressString = directoryAddress.getText();
+			components.settings.updateDirectory(folder.addressString);
+		}	
 		
 		// if in directory management, and pressed home, go to home gui
 		// also set text in home gui to reflect any changes
@@ -498,9 +481,15 @@ public class Gui implements ActionListener{
 			delay = delayGui.delay;
 			delayGui.myFrame.setVisible(true);
 			System.err.println("success! delay updated");
-			components.settings.updateDelay(delay);
+			components.settings.setDelay(delay);
 		}
 
+		// set delay
+		else if(arg0.getSource() == delayGui.setDelay){
+			delay = Integer.parseInt(delayGui.delayTime.getText().trim());
+			components.settings.setDelay(delay);
+		}	
+		
 		// update delay string on home page once delay time has been updated
 		else if(arg0.getSource() == delayGui.homeButton){
 			delayGui.myFrame.setVisible(false);
