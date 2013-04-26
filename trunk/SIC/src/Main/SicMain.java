@@ -63,7 +63,7 @@ public class SicMain {
 			String directory = settings.getDirectory().toString();
 			
 			boolean settingsChanged = false;
-			while (!dirFile.exists() || !dirFile.isDirectory()) {
+			while (!dirFile.exists() || !dirFile.isDirectory() || dirFile.listFiles().length != 0) {
 				settingsChanged = true;
 				directory = JOptionPane.showInputDialog("Please enter a default directory path");
 				directory.trim();
