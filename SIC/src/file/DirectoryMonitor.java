@@ -14,13 +14,14 @@ import java.util.*;
  *  Watch a directory and all subdirectories for changes to files.
  */
 
-public class DirectoryMonitor implements Runnable {
+public class DirectoryMonitor{// implements Runnable {
 
     private final WatchService watcher;
-    private final Map<WatchKey,Path> keys;
+    public Map<WatchKey,Path> keys;
     private final boolean recursive;
     private boolean trace = false;
     private boolean newDir = false;
+    public WatchKey key;
     
 	private Vector<File> filesChanged  = new Vector<File>();
 	private Vector<File> filesRemoved  = new Vector<File>();
@@ -31,6 +32,30 @@ public class DirectoryMonitor implements Runnable {
     @SuppressWarnings("unchecked")
     static <T> WatchEvent<T> cast(WatchEvent<?> event) {
         return (WatchEvent<T>)event;
+    }
+    
+    /**
+     * Creates a WatchService and registers the given directory
+     */
+    public DirectoryMonitor(Path path, boolean recursive) throws IOException {
+    	this.watcher = FileSystems.getDefault().newWatchService();
+        this.keys = new HashMap<WatchKey,Path>();
+        this.recursive = recursive;
+        lastModifiedTime = System.currentTimeMillis();
+        
+        // if contains sub-directories, add all
+        if (recursive) {
+            System.out.format("Scanning %s ...\n", path);
+            registerAll(path);
+            System.out.println("Done.");
+        } else {
+            register(path);
+        }
+
+        // enable trace after initial registration
+        this.trace = true;
+        this.processEvents();
+        
     }
     
     /**
@@ -71,14 +96,13 @@ public class DirectoryMonitor implements Runnable {
     	pathName = dir;
     }
     
-
     /**
      * Register the given directory with the WatchService
      */
-    private void register(Path dir) throws IOException {
+    public void register(Path dir) throws IOException {
     	//Registers what events to listen for
-        WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-        if (trace) {
+       key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+       if (trace) {
             Path prev = keys.get(key);
             if (prev == null) {
                 System.out.format("register: %s\n", dir);
@@ -108,29 +132,6 @@ public class DirectoryMonitor implements Runnable {
         });
     }
 
-    /**
-     * Creates a WatchService and registers the given directory
-     */
-    public DirectoryMonitor(Path dir, boolean recursive) throws IOException {
-        pathName = dir.toString();
-    	
-    	this.watcher = FileSystems.getDefault().newWatchService();
-        this.keys = new HashMap<WatchKey,Path>();
-        this.recursive = recursive;
-        lastModifiedTime = System.currentTimeMillis();
-
-        if (recursive) {
-            System.out.format("Scanning %s ...\n", dir);
-            registerAll(dir);
-            System.out.println("Done.");
-        } else {
-            register(dir);
-        }
-
-        // enable trace after initial registration
-        this.trace = true;
-        
-    }
 
     /**
      * Process all events for keys queued to the watcher
@@ -206,15 +207,16 @@ public class DirectoryMonitor implements Runnable {
     }
 
 
-    public void run() {
-    	//runs constantly and handles event through the process events method.
-        Path dir = Paths.get(pathName);
-        try {
-			new DirectoryMonitor(dir, recursive).processEvents();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-    }
+//    public void run() {
+//    	//runs constantly and handles event through the process events method.
+//        Path dir = Paths.get(pathName);
+//        System.err.println("The path name is:" + pathName);
+//        try {
+//			new DirectoryMonitor(dir, recursive).processEvents();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//    }
     
     
 }
