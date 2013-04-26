@@ -36,9 +36,13 @@ public class SicUploader {
 	
 	SicComponents components;
 	
-	public SicUploader(MulticastSocket listener, SicComponents components) throws SocketException {
+	public SicUploader(MulticastSocket listener, SicComponents components) {
 		this.dataSocket = listener;
-		this.dataSocket.setSoTimeout(50);
+		try {
+			this.dataSocket.setSoTimeout(50);
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
 		this.group = components.settings.get_multicastGroup();
 		this.components = components;
 		fio = new FileIO();

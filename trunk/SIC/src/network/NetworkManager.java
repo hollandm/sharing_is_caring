@@ -42,9 +42,6 @@ public class NetworkManager {
 	
 	public NetworkManager(SicComponents components) {
 		this.components = components;
-		
-//		uploader = new SicUploader(listener, group);
-//		downloader = new SicDownloader(listener);
 	}
 	
 	public void begin() {
@@ -59,9 +56,13 @@ public class NetworkManager {
 			components.dirMonitor.clearVectors();
 			
 			listener = new MulticastSocket();
-			
 			//TODO: Make sure nothing is dependent on it not timing out
 			listener.setSoTimeout(50);
+			
+
+			uploader = new SicUploader(listener, this.components);
+			downloader = new SicDownloader(listener, this.components);
+			
 			while (true) {
 
 				
@@ -75,12 +76,14 @@ public class NetworkManager {
 						Vector<File> filesChanged = components.dirMonitor.getFilesChanged();
 						if (!filesRemoved.isEmpty() || !filesChanged.isEmpty()) {
 							
-							System.out.println("Local Changes Detected, sending files since revision: ");
+							System.out.println("Local Changes Detected, sending modified files: ");
 
-							uploader.initateUpload(components.dirMonitor.getFilesChanged(), 
+							uploader.initateUpload(
+									components.dirMonitor.getFilesChanged(), 
 									components.dirMonitor.getFilesRemoved(), 
 									components.settings.getDirectory(),
 									components.settings.getRevision());
+							
 							
 							
 							components.dirMonitor.clearVectors();
@@ -151,7 +154,6 @@ public class NetworkManager {
 	//TODO: call this when changed in gui
 	public void changeGroup() {
 		try {
-
 			listener.leaveGroup(group);
 			listener.joinGroup(components.settings.get_multicastGroup());
 		} catch (IOException e) {
