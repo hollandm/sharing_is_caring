@@ -185,16 +185,33 @@ public class DirectoryMonitor implements Runnable {
                 Path name = ev.context();
                 Path child = dir.resolve(name);
 
+                File f = child.toFile();
+                
                 //If the files were newly created or modified then add to the vector.
                 if(event.kind() == ENTRY_CREATE || event.kind() == ENTRY_MODIFY){
-                	filesChanged.add(child.toFile());
+                	if (!filesChanged.contains(f)) {
+                    	filesChanged.add(f);
+                	}
+                	
+                	//if file has been deleted in same revision and then re-added
+                	//then remove it from delete list
+                	if (filesRemoved.contains(f)) {
+                		filesRemoved.remove(f);
+                	}
                 	lastModifiedTime = System.currentTimeMillis();
                 }
                 
                 //If any file was deleted then add to the corresponding vector.
                 if(event.kind() == ENTRY_DELETE){
+                	if (!filesRemoved.contains(f)) {
+                    	filesRemoved.add(f);
+                	}
+                	
+                	if (filesChanged.contains(f)) {
+                		filesChanged.remove(f);
+                	}
+                	
                 	lastModifiedTime = System.currentTimeMillis();
-                	filesRemoved.add(child.toFile());
                 }
                 
                 System.out.format("%s: %s\n", event.kind().name(), child);

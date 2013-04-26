@@ -108,11 +108,11 @@ public class SicMain {
 		ui.setComponents(components);
 		
 		//start the network manager
-//		NetworkManager netManager = new NetworkManager(components);
-//		components.netManager = netManager;
-//		
-//		
-//		netManager.begin();
+		NetworkManager netManager = new NetworkManager(components);
+		components.netManager = netManager;
+		
+		
+		netManager.begin();
 		
 	}
 
