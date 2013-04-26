@@ -94,6 +94,8 @@ public class SicMain {
 		components.settings = settings;
 		
 		
+		System.err.println("HIIIIIEIEIEIEIEI");
+
 		//start the file monitor if in auto mode
 		try {
 			path = Paths.get(components.settings.getDirectory());
@@ -104,7 +106,9 @@ public class SicMain {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+		System.err.println("HIIIIIEIEIEIEIEI");
+
+				
 		ui.setComponents(components);
 		
 		//start the network manager

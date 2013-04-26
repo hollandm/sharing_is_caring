@@ -18,10 +18,9 @@ public class DirectoryMonitor implements Runnable {
 
     private final WatchService watcher;
     public Map<WatchKey,Path> keys;
-    private final boolean recursive;
+    private boolean recursive;
     private boolean trace = false;
     private boolean newDir = false;
-    public WatchKey key;
     
 	private Vector<File> filesChanged  = new Vector<File>();
 	private Vector<File> filesRemoved  = new Vector<File>();
@@ -119,7 +118,7 @@ public class DirectoryMonitor implements Runnable {
      */
     public void register(Path dir) throws IOException {
     	//Registers what events to listen for
-       key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+       WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
        if (trace) {
             Path prev = keys.get(key);
             if (prev == null) {
@@ -156,7 +155,6 @@ public class DirectoryMonitor implements Runnable {
      */
    public void processEvents() {
         for (;;) {
-
             // wait for key to be signalled
             WatchKey key;
             try {
@@ -242,7 +240,7 @@ public class DirectoryMonitor implements Runnable {
         }
     }
 
-
+//
     public void run() {
     	//runs constantly and handles event through the process events method.
 //        Path dir = Paths.get(pathName);
