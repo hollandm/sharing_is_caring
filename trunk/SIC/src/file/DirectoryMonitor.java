@@ -83,8 +83,19 @@ public class DirectoryMonitor implements Runnable {
      * This method should be called after every upload.
      */
     public void clearVectors(){
-    	filesChanged.clear();
-    	filesRemoved.clear();
+    	
+    	
+    	for (int i = 0; i < 5; ++i) {
+	    	filesChanged.clear();
+	    	filesRemoved.clear();
+	    	
+	    	try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+    	}
+    	
     }
     
     public void test() {
