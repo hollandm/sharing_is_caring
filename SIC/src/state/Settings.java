@@ -138,6 +138,9 @@ public class Settings implements Serializable {
 		this.saveChanges();
 	}
 	
+	/**
+	 * Saves settings to the settings file.
+	 */
 	public void saveChanges() {
 		String settingsPath = System.getProperty("user.dir") + "//SIC.settings";		
 		
@@ -153,17 +156,25 @@ public class Settings implements Serializable {
 		
 	}
 	
+	/**
+	 * Creates all the default settings for when the program is initialized.
+	 * @return
+	 */
 	public static Settings createDefaultSettings() {
 		Settings settings = new Settings();
 		try {
+			//sets default multicast address
 			settings.set_multicastGroup(InetAddress.getByName("230.0.0.10"));
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
+		//Sets the default delay time.
 		settings.setDelay(15);
 		
 		File dirFile;
 		String directory;
+		
+		//Sets up the default directory to be sync.
 		do{
 			directory = JOptionPane.showInputDialog("Please enter a default directory path");
 			directory.trim();

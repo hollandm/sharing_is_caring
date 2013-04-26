@@ -119,6 +119,13 @@ public class DirectoryMonitor implements Runnable {
     public void register(Path dir) throws IOException {
     	//Registers what events to listen for
        WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+       
+       // Adds all files into our list of files that need to be sent
+       File[] listOfFiles = dir.toFile().listFiles();
+       for(int i = 0; i < listOfFiles.length; i++){
+    	   filesChanged.add(listOfFiles[i]);
+       }
+       
        if (trace) {
             Path prev = keys.get(key);
             if (prev == null) {
@@ -242,15 +249,8 @@ public class DirectoryMonitor implements Runnable {
 
 //
     public void run() {
-    	//runs constantly and handles event through the process events method.
-//        Path dir = Paths.get(pathName);
-//        System.err.println("The path name is:" + pathName);
         this.processEvents();
-//        try {
-//			new DirectoryMonitor(dir, recursive).processEvents();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+
     }
     
     

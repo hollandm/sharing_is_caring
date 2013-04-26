@@ -278,11 +278,13 @@ public class SicUploader {
 		Vector<File> filesChanged = new Vector<File>();
 		Vector<File> filesDeleted =  new Vector<File>();
 		
-		filesDeleted.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.exe"));
+		filesChanged.add(new File("/Users/VietPhan/Desktop/Screen%20Shot%202013-04-21%20at%205.05.39%20PM.png"));
+		
+//		filesDeleted.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.exe"));
 		
 //		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.exe"));
-		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test1.exe"));
-		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test2.exe"));
+//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test1.exe"));
+//		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test2.exe"));
 
 //		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/test.txt"));
 //		filesChanged.add(new File("E:/Dropbox/Sophmor Spring Semester/CS 445/testFiles/image.jpeg"));
