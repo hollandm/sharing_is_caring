@@ -118,7 +118,13 @@ public class NetworkManager {
 					//our buffer was just filled with changed caused by downloading files
 					//ignore those
 					components.dirMonitor.clearVectors();
-
+					try {
+						components.dirThread.sleep(15000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					components.dirMonitor.clearVectors();
+					
 					System.out.println("Got out");
 				}
 				
