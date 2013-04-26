@@ -33,4 +33,19 @@ public class TransferCommander {
 
 	}
 	
+	public void close() {
+		try {
+			fragReader.close();
+			fragWriter.close();
+			
+			writer.close();
+			reader.close();
+			
+			sock.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
 }

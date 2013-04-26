@@ -55,8 +55,10 @@ public class NetworkManager {
 			//clear of any weird data before we start updating
 			components.dirMonitor.clearVectors();
 			
-			listener = new MulticastSocket();
+			listener = new MulticastSocket(SicNetworkProtocol.port);
+//			System.out.println();
 			listener.joinGroup(components.settings.get_multicastGroup());
+//			this.components.settings.set_multicastGroup(InetAddress.getByName("230.0.0.10"));
 			//TODO: Make sure nothing is dependent on it not timing out
 			listener.setSoTimeout(50);
 			

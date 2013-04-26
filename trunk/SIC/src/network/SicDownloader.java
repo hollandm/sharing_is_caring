@@ -92,7 +92,7 @@ public class SicDownloader {
 		}
 		dataSocket.setSoTimeout(0);
 		
-		
+		cmd.close();
 		
 	}
 
