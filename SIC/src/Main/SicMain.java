@@ -63,10 +63,10 @@ public class SicMain {
 			String directory = settings.getDirectory().toString();
 			
 			boolean settingsChanged = false;
-			while (!dirFile.exists() || !dirFile.isDirectory() || dirFile.listFiles().length != 0) {
+			while (!dirFile.exists() || !dirFile.isDirectory()) {
 				System.err.println("The length is " + dirFile.listFiles().length);
 				settingsChanged = true;
-				directory = JOptionPane.showInputDialog("Please enter a default directory path (directory must be empty)");
+				directory = JOptionPane.showInputDialog("Please enter a default directory path");
 				directory.trim();
 				dirFile = new File(directory);
 			}
@@ -75,7 +75,6 @@ public class SicMain {
 			}
 			
 			components.settings = settings;
-//			components.dirList.add(settings.getDirectory());
 			ui = new Gui(components);	
 			components.ui = ui;
 			
@@ -94,9 +93,6 @@ public class SicMain {
 		
 		components.settings = settings;
 		
-		
-		System.err.println("HIIIIIEIEIEIEIEI");
-
 		//start the file monitor if in auto mode
 		try {
 			path = Paths.get(components.settings.getDirectory());
@@ -107,15 +103,12 @@ public class SicMain {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.err.println("HIIIIIEIEIEIEIEI");
-
 				
 		ui.setComponents(components);
 		
 		//start the network manager
 		NetworkManager netManager = new NetworkManager(components);
 		components.netManager = netManager;
-		
 		
 		netManager.begin();
 		
