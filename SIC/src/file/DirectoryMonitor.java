@@ -85,22 +85,19 @@ public class DirectoryMonitor implements Runnable {
     public void clearVectors(){
     	
     	
-    	for (int i = 0; i < 40; ++i) {
+//    	for (int i = 0; i < 40; ++i) {
 	    	filesChanged.clear();
 	    	filesRemoved.clear();
 	    	
-	    	try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-    	}
+//	    	try {
+//				Thread.sleep(500);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//    	}
     	
     }
     
-    public void test() {
-    	
-    }
     
     /**
      * Sets the path to the new file path
