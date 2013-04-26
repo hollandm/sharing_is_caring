@@ -17,12 +17,16 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetAddress;
 import java.net.URL;
+import java.nio.file.Paths;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+
+import file.DirectoryMonitor;
 
 import Main.SicComponents;
 
@@ -35,7 +39,7 @@ public class Gui implements ActionListener{
 	protected JFrame myFrame = new JFrame();
 	
 	protected int versionID = 0;
-	
+		
 
 	/**
 	 * Instances of labels for information box. Displays current update version,
@@ -461,7 +465,11 @@ public class Gui implements ActionListener{
 		else if(arg0.getSource() == folder.setFolderAddressButton){
 			folder.addressString = folder.directoryAddress.getText();
 			components.settings.updateDirectory(folder.addressString);
-			components.dirMonitor.setPath(folder.addressString);
+			try {
+				components.dirMonitor = new DirectoryMonitor(Paths.get(folder.addressString), true);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}	
 		
 		// if in directory management, and pressed home, go to home gui
