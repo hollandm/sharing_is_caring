@@ -89,6 +89,16 @@ public class NetworkManager {
 							
 							components.dirMonitor.clearVectors();
 							
+							//Avoids picking up the packets we sent to start the upload
+							clearLoop:
+							while (true) {
+								try {
+									listener.receive(recvCmd);
+								} catch (Exception e) {
+									break clearLoop;
+								}
+							}
+							
 						}
 					}
 					
@@ -100,7 +110,7 @@ public class NetworkManager {
 				} catch (SocketTimeoutException e) {
 					continue;
 				}
-				System.out.println("Got File");
+				System.out.println("Got Packet");
 				if(SicNetworkProtocol.getCmdType(cmdIN) == SicNetworkProtocol.pushRevision) {
 					System.out.println("File Transfer Initiated");
 					downloader.initiateFileDownload(cmdIN);
