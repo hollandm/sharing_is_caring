@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.SocketTimeoutException;
 import java.util.Vector;
 
 import state.Settings;
@@ -46,8 +47,6 @@ public class NetworkManager {
 //		downloader = new SicDownloader(listener);
 	}
 	
-	//TODO If autoUpdate is disabled then don't do this!!
-	
 	public void begin() {
 		try {
 
@@ -56,13 +55,22 @@ public class NetworkManager {
 			DatagramPacket recvCmd = new DatagramPacket(cmdIN, SicNetworkProtocol.cmdPacketSize); //DatagramPacket for receiving packets of length 10
 			System.out.println("Listening to traffic");
 
+			//clear of any weird data before we start updating
+			components.dirMonitor.clearVectors();
+			
+			listener = new MulticastSocket();
+			
+			//TODO: Make sure nothing is dependent on it not timing out
+			listener.setSoTimeout(50);
 			while (true) {
 
 				
 				if (components.settings.is_auto_updates_enabled()) {
-					
-					if (components.dirMonitor.getLastModTime() > System.currentTimeMillis() + fileWaitTime) {
+//					System.out.println("Updates Enabled");
+					if (components.dirMonitor.getLastModTime() + fileWaitTime < System.currentTimeMillis()) {
 						
+						
+//						System.out.println("Time ok " + components.dirMonitor.getLastModTime());
 						Vector<File> filesRemoved = components.dirMonitor.getFilesRemoved();
 						Vector<File> filesChanged = components.dirMonitor.getFilesChanged();
 						if (!filesRemoved.isEmpty() || !filesChanged.isEmpty()) {
@@ -83,7 +91,11 @@ public class NetworkManager {
 					
 				}
 				
-				listener.receive(recvCmd); //fills command buffer with data received
+				try {
+					listener.receive(recvCmd); //fills command buffer with data received
+				} catch (SocketTimeoutException e) {
+					continue;
+				}
 				if(SicNetworkProtocol.getCmdType(cmdIN) == SicNetworkProtocol.pushRevision) {
 					System.out.println("File Transfer Initiated");
 					downloader.initiateFileDownload(cmdIN);
