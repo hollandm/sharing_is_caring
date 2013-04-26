@@ -16,6 +16,8 @@ import network.NetworkManager;
  */
 public class SicComponents {
 
+	public Thread dirThread;
+	
 	public Settings settings;
 	public ArrayList<String> dirList = new ArrayList<String>();
 	public Gui ui;
