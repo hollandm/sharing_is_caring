@@ -64,8 +64,9 @@ public class SicMain {
 			
 			boolean settingsChanged = false;
 			while (!dirFile.exists() || !dirFile.isDirectory() || dirFile.listFiles().length != 0) {
+				System.err.println("The length is " + dirFile.listFiles().length);
 				settingsChanged = true;
-				directory = JOptionPane.showInputDialog("Please enter a default directory path");
+				directory = JOptionPane.showInputDialog("Please enter a default directory path (directory must be empty)");
 				directory.trim();
 				dirFile = new File(directory);
 			}
