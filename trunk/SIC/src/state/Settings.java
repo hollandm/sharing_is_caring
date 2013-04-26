@@ -168,7 +168,7 @@ public class Settings implements Serializable {
 			directory = JOptionPane.showInputDialog("Please enter a default directory path");
 			directory.trim();
 			dirFile = new File(directory);
-		} while(!dirFile.isDirectory());
+		} while(!dirFile.isDirectory() || dirFile.listFiles().length != 0);
 		// if directory does not exist, keep prompting user
 		settings.updateDirectory(directory);
 		return settings;
