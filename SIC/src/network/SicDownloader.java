@@ -93,6 +93,7 @@ public class SicDownloader {
 		dataSocket.setSoTimeout(0);
 		
 		cmd.close();
+		System.out.println("All Files Recieved");
 		
 	}
 
@@ -143,9 +144,10 @@ public class SicDownloader {
 		//request any missed or damaged packets
 		
 		if (fragsRecivedCount < fragmentsExpected) {
+			System.out.print("Missed fragments: ");
 			for (int i = 0; i < fragmentsExpected; ++i) {
 				if (fragsRecived[i] == false) {
-					System.out.println("Missed fragment " + i);
+					System.out.print(i+", ");
 					cmd.writer.println(i);
 					
 					cmd.fragReader.read(fragReceived);
@@ -153,6 +155,7 @@ public class SicDownloader {
 					processDataFragment();
 				}
 			}
+			System.out.println();
 		}
 		
 		//write data to disk

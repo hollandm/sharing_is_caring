@@ -162,6 +162,13 @@ public class SicUploader {
 		
 		}
 		
+		//TO avoid always missing first few fragments
+		try {
+			Thread.sleep(50);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		
 		System.out.println("File sent: "+relativePath+ ", " +fileData.length + " Bytes via " + fragmentsNeeded + " fragments." );
 		
 		
@@ -210,6 +217,8 @@ public class SicUploader {
 				}
 			}
 		}
+		
+		System.out.println("Acks Recieved");
 		
 	}
 	
