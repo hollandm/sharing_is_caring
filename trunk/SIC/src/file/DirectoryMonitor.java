@@ -120,12 +120,6 @@ public class DirectoryMonitor implements Runnable {
     	//Registers what events to listen for
        WatchKey key = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
        
-       // Adds all files into our list of files that need to be sent
-       File[] listOfFiles = dir.toFile().listFiles();
-       for(int i = 0; i < listOfFiles.length; i++){
-    	   filesChanged.add(listOfFiles[i]);
-       }
-       
        if (trace) {
             Path prev = keys.get(key);
             if (prev == null) {
