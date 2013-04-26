@@ -14,7 +14,7 @@ import java.util.*;
  *  Watch a directory and all subdirectories for changes to files.
  */
 
-public class DirectoryMonitor{// implements Runnable {
+public class DirectoryMonitor implements Runnable {
 
     private final WatchService watcher;
     public Map<WatchKey,Path> keys;
@@ -54,7 +54,7 @@ public class DirectoryMonitor{// implements Runnable {
 
         // enable trace after initial registration
         this.trace = true;
-        this.processEvents();
+//        this.processEvents();
         
     }
     
@@ -88,12 +88,30 @@ public class DirectoryMonitor{// implements Runnable {
     	filesRemoved.clear();
     }
     
+    public void test() {
+    	
+    }
+    
     /**
      * Sets the path to the new file path
      * @param dir
      */
-    public void setPath(String dir){
+    public void changeRoot(String dir){
     	pathName = dir;
+    	
+    	
+    	Set<WatchKey> ks = keys.keySet();
+    	for (WatchKey k : ks) {
+    		k.cancel();
+    	}
+    	
+    	keys.clear();
+    	
+    	try {
+			registerAll(Paths.get(dir));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
     
     /**
@@ -197,7 +215,8 @@ public class DirectoryMonitor{// implements Runnable {
             boolean valid = key.reset();
             if (!valid) {
                 keys.remove(key);
-
+                
+                
                 // all directories are inaccessible
                 if (keys.isEmpty()) {
                     break;
@@ -207,16 +226,17 @@ public class DirectoryMonitor{// implements Runnable {
     }
 
 
-//    public void run() {
-//    	//runs constantly and handles event through the process events method.
+    public void run() {
+    	//runs constantly and handles event through the process events method.
 //        Path dir = Paths.get(pathName);
 //        System.err.println("The path name is:" + pathName);
+        this.processEvents();
 //        try {
 //			new DirectoryMonitor(dir, recursive).processEvents();
 //		} catch (IOException e) {
 //			e.printStackTrace();
 //		}
-//    }
+    }
     
     
 }

@@ -98,8 +98,8 @@ public class SicMain {
 		try {
 			path = Paths.get(components.settings.getDirectory());
 			dirMonitor = new DirectoryMonitor(path, true);
-			//Thread t1 = new Thread(dirMonitor);
-			//t1.start();
+			Thread t1 = new Thread(dirMonitor);
+			t1.start();
 			components.dirMonitor = dirMonitor;
 		} catch (IOException e) {
 			e.printStackTrace();

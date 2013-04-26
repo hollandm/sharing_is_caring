@@ -465,11 +465,26 @@ public class Gui implements ActionListener{
 		else if(arg0.getSource() == folder.setFolderAddressButton){
 			folder.addressString = folder.directoryAddress.getText();
 			components.settings.updateDirectory(folder.addressString);
-			try {
-				components.dirMonitor = new DirectoryMonitor(Paths.get(folder.addressString), true);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			
+//			if (components == null) {
+//				System.out.println("Error 0");
+				if (components.dirMonitor == null) {
+					System.out.println("Error 1");
+				}
+//			}
+
+			components.dirMonitor.test();
+
+			components.dirMonitor.clearVectors();
+			components.dirMonitor.changeRoot(folder.addressString);
+			
+			
+//			Brute force method... and from sherry, she is tiny!
+//			try {
+//				components.dirMonitor = new DirectoryMonitor(Paths.get(folder.addressString), true);
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
 		}	
 		
 		// if in directory management, and pressed home, go to home gui
@@ -537,11 +552,11 @@ public class Gui implements ActionListener{
 		}
 	}
 	
-	/** create and startup a SwingDemo */
-	public static void main(String[] args)
-	{
-		//Gui NiceGui = new Gui("c:/desktop", );
-	}//main
+//	/** create and startup a SwingDemo */
+//	public static void main(String[] args)
+//	{
+//		//Gui NiceGui = new Gui("c:/desktop", );
+//	}//main
 
 	/** getter method for SicComponents */
 	public void setComponents(SicComponents comp){
