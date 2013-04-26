@@ -56,6 +56,7 @@ public class NetworkManager {
 			components.dirMonitor.clearVectors();
 			
 			listener = new MulticastSocket();
+			listener.joinGroup(components.settings.get_multicastGroup());
 			//TODO: Make sure nothing is dependent on it not timing out
 			listener.setSoTimeout(50);
 			
@@ -84,8 +85,6 @@ public class NetworkManager {
 									components.settings.getDirectory(),
 									components.settings.getRevision());
 							
-							
-							
 							components.dirMonitor.clearVectors();
 							
 						}
@@ -99,6 +98,7 @@ public class NetworkManager {
 				} catch (SocketTimeoutException e) {
 					continue;
 				}
+				System.out.println("Got File");
 				if(SicNetworkProtocol.getCmdType(cmdIN) == SicNetworkProtocol.pushRevision) {
 					System.out.println("File Transfer Initiated");
 					downloader.initiateFileDownload(cmdIN);
