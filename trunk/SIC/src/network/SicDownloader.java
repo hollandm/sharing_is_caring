@@ -60,11 +60,16 @@ public class SicDownloader {
 		//attempt to connect to the server
 		try {
 			System.out.println("Attempting to Connect to: "+addr);
+			if (cmd != null) {
+				System.out.println("cmd not closed");
+			}
 			cmd = new TransferCommander( new Socket(addr, SicNetworkProtocol.transferCmdPort));
 		} catch (IOException e2) {
-			System.err.println("F#@$!\n");
-			e2.printStackTrace();
-			System.exit(0);
+//			System.err.println("F#@$!\n");
+//			e2.printStackTrace();
+//			System.exit(0);
+//			System.err.println("Failed to open connection");
+			return;
 		}
 		
 		
@@ -85,12 +90,12 @@ public class SicDownloader {
 			fio.deleteFile(del);
 		}
 		
-		dataSocket.setSoTimeout(250);
+//		dataSocket.setSoTimeout(250);
 		//LETS DOWNLOAD SOME FILES NOW!
 		for (int curFile = 0; numFiles > curFile; ++curFile) {
 			downloadFile();
 		}
-		dataSocket.setSoTimeout(0);
+//		dataSocket.setSoTimeout(0);
 		
 		cmd.close();
 		System.out.println("All Files Recieved");
