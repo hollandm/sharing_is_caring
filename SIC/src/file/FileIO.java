@@ -58,6 +58,8 @@ public class FileIO {
 	 */
 	public void writeFile(File file, byte[] data) throws IOException {
 		
+		//TODO: create directories to file
+		
 		//If file hasn't been created yet, create it.
 		if (!file.exists()) {
 			file.createNewFile();

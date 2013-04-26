@@ -118,6 +118,8 @@ public class NetworkManager {
 					//our buffer was just filled with changed caused by downloading files
 					//ignore those
 					components.dirMonitor.clearVectors();
+
+					System.out.println("Got out");
 				}
 				
 				if(SicNetworkProtocol.getCmdType(cmdIN) == SicNetworkProtocol.pullRevision) {
