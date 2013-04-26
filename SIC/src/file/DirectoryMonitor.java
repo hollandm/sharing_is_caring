@@ -85,7 +85,7 @@ public class DirectoryMonitor implements Runnable {
     public void clearVectors(){
     	
     	
-    	for (int i = 0; i < 5; ++i) {
+    	for (int i = 0; i < 15; ++i) {
 	    	filesChanged.clear();
 	    	filesRemoved.clear();
 	    	
