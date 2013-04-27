@@ -349,6 +349,7 @@ public class Gui implements ActionListener{
 			System.out.println("Error 1");
 		}
 
+		components.dirMonitor.test();
 		components.dirMonitor.clearVectors();
 		components.dirMonitor.changeRoot(folder.addressString);
 	}
