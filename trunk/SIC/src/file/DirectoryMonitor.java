@@ -12,6 +12,8 @@ import java.util.*;
 
 /**
  *  Watch a directory and all subdirectories for changes to files.
+ *  This class was modeled after Oracle's tutorial for implementing
+ *  the WatchService class. 
  */
 
 public class DirectoryMonitor implements Runnable {
@@ -85,19 +87,22 @@ public class DirectoryMonitor implements Runnable {
     public void clearVectors(){
     	
     	
-//    	for (int i = 0; i < 40; ++i) {
+    	for (int i = 0; i < 40; ++i) {
 	    	filesChanged.clear();
 	    	filesRemoved.clear();
 	    	
-//	    	try {
-//				Thread.sleep(500);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//    	}
+	    	try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+    	}
     	
     }
     
+    public void test() {
+    	
+    }
     
     /**
      * Sets the path to the new file path
