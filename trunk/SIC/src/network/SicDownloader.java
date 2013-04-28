@@ -114,7 +114,7 @@ public class SicDownloader {
 		
 		System.out.println("Downloading File: "+relativePath+", it is "+fileSize+" bytes big");
 		
-		
+		if (fileSize > 0) {
 		//TODO: keep track of which fragments received so far
 		int fragmentsExpected = fileSize / SicNetworkProtocol.dataPacketDataCapacity + 1;
 		
@@ -162,11 +162,13 @@ public class SicDownloader {
 			}
 			System.out.println();
 		}
-		
+		}
 		//write data to disk
 		File file = new File(rootPath+"/"+relativePath);
 		if (!file.exists()) file.createNewFile();
-		fio.writeFile(file, fileData);
+		if (fileSize > 0) {
+			fio.writeFile(file, fileData);
+		}
 		
 		//clear file buffer
 		fileData = null;
