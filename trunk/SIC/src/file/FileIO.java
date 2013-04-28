@@ -58,7 +58,7 @@ public class FileIO {
 	 */
 	public void writeFile(File file, byte[] data) throws IOException {
 		
-		file.getParentFile().mkdirs();
+		file.getAbsoluteFile().getParentFile().mkdirs();
 		
 		//If file hasn't been created yet, create it.
 		if (!file.exists()) {

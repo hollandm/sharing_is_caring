@@ -12,6 +12,8 @@ import java.util.*;
 
 /**
  *  Watch a directory and all subdirectories for changes to files.
+ *  This class was modeled after Oracle's tutorial for implementing 		
+ *  the WatchService class.
  */
 
 public class DirectoryMonitor implements Runnable {
