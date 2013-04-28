@@ -74,10 +74,10 @@ public class SicUploader {
 
 		SicNetworkProtocol.setIP(cmdBuffer);
 		cmdBuffer[1] = SicNetworkProtocol.pushRevision;
-		for (int i = 0; i < 30; ++i) {
+		for (int i = 0; i < 50; ++i) {
 			dataSocket.send(cmdPacket);
 			try {
-				Thread.sleep(10);
+				Thread.sleep(20);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
