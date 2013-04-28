@@ -165,9 +165,10 @@ public class SicDownloader {
 		}
 		//write data to disk
 		File file = new File(rootPath+"/"+relativePath);
-		if (!file.exists()) file.createNewFile();
 		if (fileSize > 0) {
 			fio.writeFile(file, fileData);
+		} else {
+			file.createNewFile();
 		}
 		
 		//clear file buffer
