@@ -38,6 +38,7 @@ public class FileIO {
 			//converts the file into a byte array
 			data = new byte[in.available()];
 			in.readFully(data);
+			in.close();
 			
 		} catch (IOException e) {
 			e.printStackTrace();

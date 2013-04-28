@@ -9,28 +9,12 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetAddress;
 import java.net.URL;
-import java.nio.file.Paths;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
-import file.DirectoryMonitor;
-
 import Main.SicComponents;
-
-import state.Settings;
 
 /**
  * Gui
