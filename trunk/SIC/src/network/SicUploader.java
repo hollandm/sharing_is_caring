@@ -172,21 +172,22 @@ public class SicUploader {
 		System.out.println("File sent: "+relativePath+ ", " +fileData.length + " Bytes via " + fragmentsNeeded + " fragments." );
 		
 		
-		
-		//send file in fragments
-		for (int fragID = 0; fragmentsNeeded > fragID; ++fragID) {
+		if (fragmentsNeeded > 0) {
 			
-//			byte[] frag = 
-			formatFragment(fragID);
-			
-			//send the fragment
-			dataSocket.send(sendData);
-			
-			//TODO: Calibrate wait time
-			try {
-				Thread.sleep(components.settings.getDelay());
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			//send file in fragments
+			for (int fragID = 0; fragmentsNeeded > fragID; ++fragID) {
+				
+
+				formatFragment(fragID);
+				
+				//send the fragment
+				dataSocket.send(sendData);
+				
+				try {
+					Thread.sleep(components.settings.getDelay());
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		
