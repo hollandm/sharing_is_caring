@@ -12,8 +12,6 @@ import java.util.*;
 
 /**
  *  Watch a directory and all subdirectories for changes to files.
- *  This class was modeled after Oracle's tutorial for implementing
- *  the WatchService class. 
  */
 
 public class DirectoryMonitor implements Runnable {
@@ -97,10 +95,6 @@ public class DirectoryMonitor implements Runnable {
 				e.printStackTrace();
 			}
     	}
-    	
-    }
-    
-    public void test() {
     	
     }
     
@@ -201,16 +195,20 @@ public class DirectoryMonitor implements Runnable {
                 
                 //If the files were newly created or modified then add to the vector.
                 if(event.kind() == ENTRY_CREATE || event.kind() == ENTRY_MODIFY){
-                	if (!filesChanged.contains(f)) {
-                    	filesChanged.add(f);
+                	if (f.isFile()) {
+	                	if (!filesChanged.contains(f)) {
+	                    	filesChanged.add(f);
+	                	}
+	                	
+	                	//if file has been deleted in same revision and then re-added
+	                	//then remove it from delete list
+	                	if (filesRemoved.contains(f)) {
+	                		filesRemoved.remove(f);
+	                	}
+	                	lastModifiedTime = System.currentTimeMillis();
+                	} else {
+                		System.out.println("Yuck a directory");
                 	}
-                	
-                	//if file has been deleted in same revision and then re-added
-                	//then remove it from delete list
-                	if (filesRemoved.contains(f)) {
-                		filesRemoved.remove(f);
-                	}
-                	lastModifiedTime = System.currentTimeMillis();
                 }
                 
                 //If any file was deleted then add to the corresponding vector.
