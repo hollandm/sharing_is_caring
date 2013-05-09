@@ -14,6 +14,7 @@ import state.Settings;
 import Main.SicComponents;
 
 
+import file.DirectoryMonitor;
 import file.FileIO;
 
 public class SicDownloader {
@@ -98,6 +99,12 @@ public class SicDownloader {
 //		dataSocket.setSoTimeout(0);
 		
 		cmd.close();
+		
+		File endMarker = new File(rootPath+"/"+DirectoryMonitor.eotMarker);
+		endMarker.createNewFile();
+		endMarker.delete();
+		
+		
 		System.out.println("All Files Recieved");
 		
 	}

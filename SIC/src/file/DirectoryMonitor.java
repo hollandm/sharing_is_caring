@@ -24,6 +24,8 @@ public class DirectoryMonitor implements Runnable {
     private boolean trace = false;
     private boolean newDir = false;
     
+    public static final String eotMarker = "EOF.MARKER";
+    
 	private Vector<File> filesChanged  = new Vector<File>();
 	private Vector<File> filesRemoved  = new Vector<File>();
 	private String pathName;
@@ -87,16 +89,16 @@ public class DirectoryMonitor implements Runnable {
     public void clearVectors(){
     	
     	
-    	for (int i = 0; i < 40; ++i) {
+//    	for (int i = 0; i < 40; ++i) {
 	    	filesChanged.clear();
 	    	filesRemoved.clear();
 	    	
-	    	try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-    	}
+//	    	try {
+//				Thread.sleep(500);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//    	}
     	
     }
     
@@ -215,6 +217,11 @@ public class DirectoryMonitor implements Runnable {
                 
                 //If any file was deleted then add to the corresponding vector.
                 if(event.kind() == ENTRY_DELETE){
+                	if (f.getName() == DirectoryMonitor.eotMarker) {
+                		clearVectors();
+                		break;
+                	}
+                	
                 	if (!filesRemoved.contains(f)) {
                     	filesRemoved.add(f);
                 	}
